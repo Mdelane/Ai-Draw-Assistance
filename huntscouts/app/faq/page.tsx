@@ -109,20 +109,23 @@ export default function FAQPage() {
   return (
     <>
       <Navbar />
-      <main className="max-w-3xl mx-auto px-6 py-16">
-        <div className="mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-3">Frequently Asked Questions</h1>
-          <p className="text-gray-500 text-lg">Everything you need to know before booking your first guided hunt.</p>
-        </div>
 
-        <div className="space-y-12">
+      {/* Hero */}
+      <div className="bg-stone-50 border-b border-stone-200 py-14 px-6 text-center">
+        <p className="text-xs font-bold uppercase tracking-widest text-[#1B4332] mb-3">Support</p>
+        <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-3">Frequently Asked Questions</h1>
+        <p className="text-gray-500 max-w-md mx-auto">Everything you need to know before booking your first guided hunt.</p>
+      </div>
+
+      <main className="max-w-3xl mx-auto px-6 py-16">
+        <div className="space-y-14">
           {sections.map(section => (
             <div key={section.heading}>
-              <h2 className="text-sm font-semibold text-[#1B4332] uppercase tracking-wider mb-5">{section.heading}</h2>
-              <div className="space-y-6">
+              <p className="text-xs font-bold uppercase tracking-widest text-[#1B4332] mb-5">{section.heading}</p>
+              <div className="space-y-0 divide-y divide-stone-100 border border-stone-100 rounded-2xl overflow-hidden bg-white">
                 {section.items.map(item => (
-                  <div key={item.q} className="border-b border-gray-100 pb-6 last:border-0">
-                    <h3 className="font-semibold text-gray-900 mb-2">{item.q}</h3>
+                  <div key={item.q} className="px-6 py-5">
+                    <h3 className="font-black text-gray-900 tracking-tight mb-2">{item.q}</h3>
                     <p className="text-gray-600 leading-relaxed text-sm">{item.a}</p>
                   </div>
                 ))}
@@ -131,15 +134,20 @@ export default function FAQPage() {
           ))}
         </div>
 
-        <div className="mt-16 bg-gray-50 border border-gray-200 rounded-2xl p-8 text-center">
-          <p className="text-gray-600 mb-4">Still have a question?</p>
-          <a href="mailto:support@huntscouts.com" className="text-[#1B4332] font-medium hover:underline">
+        {/* Still have a question */}
+        <div className="mt-16 bg-[#1B4332] rounded-2xl p-8 text-center text-white">
+          <h2 className="text-xl font-black tracking-tight mb-2">Still have a question?</h2>
+          <p className="text-green-200 text-sm mb-5">We respond within 4 business hours, Monday–Friday.</p>
+          <a
+            href="mailto:support@huntscouts.com"
+            className="inline-block bg-amber-400 text-black px-6 py-3 rounded-xl font-black hover:bg-amber-300 transition-colors"
+          >
             support@huntscouts.com
           </a>
-          <div className="mt-6 pt-6 border-t border-gray-200 flex justify-center gap-6 text-sm">
-            <Link href="/listings" className="text-gray-500 hover:text-[#1B4332]">Browse hunts</Link>
-            <Link href="/scout" className="text-gray-500 hover:text-[#1B4332]">Draw odds</Link>
-            <Link href="/outfitters/apply" className="text-gray-500 hover:text-[#1B4332]">List your hunts</Link>
+          <div className="mt-6 pt-6 border-t border-white/10 flex justify-center gap-6 text-sm">
+            <Link href="/listings" className="text-green-200 hover:text-white transition-colors">Browse hunts</Link>
+            <Link href="/scout" className="text-green-200 hover:text-white transition-colors">Draw odds</Link>
+            <Link href="/outfitters/apply" className="text-green-200 hover:text-white transition-colors">List your hunts</Link>
           </div>
         </div>
       </main>

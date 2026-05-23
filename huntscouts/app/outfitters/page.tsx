@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
 
 const STATES = ['CO', 'WY', 'MT', 'UT', 'ID', 'AZ', 'NV']
 
@@ -22,7 +23,6 @@ export default async function OutfittersPage({ searchParams }: { searchParams: P
 
   const { data: outfitters } = await (query as any).order('founding_outfitter', { ascending: false })
 
-  // Filter by species client-side (listings is an array)
   const filtered = params.species
     ? outfitters?.filter((o: any) =>
         o.listings?.some((l: any) => l.species?.includes(params.species))
@@ -32,30 +32,47 @@ export default async function OutfittersPage({ searchParams }: { searchParams: P
   return (
     <>
       <Navbar />
-      <main className="max-w-5xl mx-auto px-6 py-10">
-        <div className="flex items-end justify-between mb-8">
+
+      {/* Header */}
+      <div className="bg-stone-50 border-b border-stone-200 py-12 px-6">
+        <div className="max-w-5xl mx-auto flex items-end justify-between gap-4 flex-wrap">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Outfitters</h1>
-            <p className="text-gray-500 mt-1">{filtered?.length ?? 0} outfitters across the West</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-[#1B4332] mb-2">Verified Outfitters</p>
+            <h1 className="text-4xl font-black text-gray-900 tracking-tight">
+              {filtered?.length ?? 0} outfitters across the West
+            </h1>
           </div>
-          <Link href="/founding-outfitter" className="text-sm text-[#1B4332] hover:underline font-medium">
+          <Link href="/founding-outfitter" className="text-sm text-[#1B4332] hover:underline font-black">
             Join as an outfitter →
           </Link>
         </div>
+      </div>
 
+      <main className="max-w-5xl mx-auto px-6 py-10">
         {/* Filters */}
-        <form method="get" className="flex gap-3 mb-8">
-          <select name="state" defaultValue={params.state ?? ''} className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]">
+        <form method="get" className="flex gap-3 mb-8 flex-wrap">
+          <select
+            name="state"
+            defaultValue={params.state ?? ''}
+            className="border border-stone-300 rounded-xl px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
+          >
             <option value="">All states</option>
             {STATES.map(s => <option key={s}>{s}</option>)}
           </select>
-          <select name="species" defaultValue={params.species ?? ''} className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]">
+          <select
+            name="species"
+            defaultValue={params.species ?? ''}
+            className="border border-stone-300 rounded-xl px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
+          >
             <option value="">All species</option>
             {['elk', 'mule deer', 'whitetail', 'pronghorn', 'bear', 'bighorn sheep', 'mountain goat'].map(s => (
               <option key={s} className="capitalize">{s}</option>
             ))}
           </select>
-          <button type="submit" className="bg-[#1B4332] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#163828] transition-colors">
+          <button
+            type="submit"
+            className="bg-amber-400 text-black px-4 py-2 rounded-xl text-sm font-black hover:bg-amber-300 transition-colors"
+          >
             Filter
           </button>
           {(params.state || params.species) && (
@@ -70,16 +87,16 @@ export default async function OutfittersPage({ searchParams }: { searchParams: P
               const minPrice = o.listings?.reduce((min: number, l: any) => l.base_price < min ? l.base_price : min, Infinity)
 
               return (
-                <div key={o.id} className="bg-white border border-gray-200 rounded-2xl p-6 hover:border-[#1B4332] transition-colors">
+                <div key={o.id} className="bg-white border border-stone-200 rounded-2xl p-6 hover:border-[#1B4332] transition-colors">
                   <div className="flex items-start justify-between gap-6">
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h2 className="text-lg font-semibold text-gray-900">{o.business_name}</h2>
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <h2 className="text-lg font-black text-gray-900 tracking-tight">{o.business_name}</h2>
                         {o.founding_outfitter && (
-                          <span className="bg-amber-100 text-amber-800 text-xs font-medium px-2 py-0.5 rounded-full">Founding</span>
+                          <span className="bg-amber-400 text-black text-xs font-black uppercase tracking-widest px-2 py-0.5 rounded-full">Founding</span>
                         )}
                         {o.license_verified && (
-                          <span className="bg-green-100 text-green-700 text-xs font-medium px-2 py-0.5 rounded-full">✓ Verified</span>
+                          <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-0.5 rounded-full">✓ Verified</span>
                         )}
                       </div>
                       <div className="text-gray-500 text-sm mb-2">
@@ -99,14 +116,14 @@ export default async function OutfittersPage({ searchParams }: { searchParams: P
                     </div>
                     <div className="text-right shrink-0">
                       {minPrice !== Infinity && (
-                        <div className="text-lg font-bold text-gray-900">
+                        <div className="text-lg font-black text-gray-900">
                           From ${minPrice?.toLocaleString()}
                         </div>
                       )}
                       <div className="text-xs text-gray-400 mb-3">{o.listings?.length ?? 0} listing{o.listings?.length !== 1 ? 's' : ''}</div>
                       <Link
                         href={`/listings?outfitter=${o.id}`}
-                        className="block bg-[#1B4332] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#163828] transition-colors text-center"
+                        className="block bg-amber-400 text-black px-4 py-2 rounded-xl text-sm font-black hover:bg-amber-300 transition-colors text-center"
                       >
                         View hunts
                       </Link>
@@ -117,11 +134,12 @@ export default async function OutfittersPage({ searchParams }: { searchParams: P
             })}
           </div>
         ) : (
-          <div className="bg-gray-50 border border-dashed border-gray-200 rounded-xl p-16 text-center text-gray-400">
+          <div className="bg-stone-50 border border-dashed border-stone-300 rounded-2xl p-16 text-center text-gray-400">
             No outfitters match your filters.
           </div>
         )}
       </main>
+      <Footer />
     </>
   )
 }

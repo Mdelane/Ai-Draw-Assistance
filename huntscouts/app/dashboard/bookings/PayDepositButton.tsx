@@ -16,7 +16,7 @@ export default function PayDepositButton({ bookingId }: { bookingId: string }) {
     <button
       onClick={handlePay}
       disabled={loading}
-      className="mt-2 text-xs bg-amber-500 text-white px-3 py-1.5 rounded-lg font-medium hover:bg-amber-600 disabled:opacity-50 transition-colors"
+      className="mt-2 text-xs bg-amber-400 text-black px-3 py-1.5 rounded-xl font-black hover:bg-amber-300 disabled:opacity-50 transition-colors"
     >
       {loading ? '...' : 'Pay deposit →'}
     </button>

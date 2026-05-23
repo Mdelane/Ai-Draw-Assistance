@@ -5,7 +5,6 @@ import { createAdminClient } from '@/lib/supabase/server'
 import { sendBookingConfirmed } from '@/lib/email'
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
   const { id: bookingId } = await params
 
   let userCtx: Awaited<ReturnType<typeof requireUser>>
@@ -35,8 +34,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   let paymentUrl: string | null = null
 
   // Create Stripe checkout for deposit if needed
-  if (b.deposit_amount) {
+  if (b.deposit_amount && process.env.STRIPE_SECRET_KEY) {
     try {
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
       const session = await stripe.checkout.sessions.create({
         mode: 'payment',
         payment_method_types: ['card'],

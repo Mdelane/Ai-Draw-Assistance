@@ -8,6 +8,7 @@ import ListingViewTracker from '@/components/ListingViewTracker'
 import StickyBookingBar from '@/components/StickyBookingBar'
 import ReviewsSection from './ReviewsSection'
 import ScoutWidget from './ScoutWidget'
+import VideoEmbed from '@/components/VideoEmbed'
 import type { Metadata } from 'next'
 import type { DrawOdds } from '@/lib/types'
 
@@ -125,6 +126,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
     : null
 
   const successRate = listing.success_rate_override ?? listing.outfitter_profiles?.success_rate
+  const isTrespass = listing.listing_type === 'trespass_fee' || listing.listing_type === 'private_land'
 
   return (
     <>
@@ -145,22 +147,56 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
         {/* ── Zone: hero ── */}
         <div id="zone-hero" className="mb-6">
           <div className="flex flex-wrap gap-2 mb-3">
+            {listing.listing_type === 'trespass_fee' && (
+              <span className="bg-amber-50 text-amber-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+                Trespass Fee
+              </span>
+            )}
+            {listing.listing_type === 'private_land' && (
+              <span className="bg-stone-100 text-stone-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+                Private Land
+              </span>
+            )}
+            {listing.landowner_verified && (
+              <span className="bg-green-50 text-green-800 text-xs font-bold px-3 py-1 rounded-full">
+                ✓ Verified Landowner
+              </span>
+            )}
+            {listing.priority_access && (
+              <span className="bg-[#1B4332] text-white text-xs font-bold px-3 py-1 rounded-full">
+                Priority Listing
+              </span>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-2 mb-3">
             {listing.species?.map((s: string) => (
-              <span key={s} className="bg-green-50 text-green-800 text-sm px-3 py-1 rounded-full capitalize">{s}</span>
+              <span key={s} className="bg-green-50 text-green-800 text-sm px-3 py-1 rounded-full capitalize font-medium">{s}</span>
             ))}
           </div>
           <div className="flex items-start justify-between gap-4 flex-wrap">
-            <h1 className="text-3xl font-bold text-gray-900">{listing.title}</h1>
+            <h1 className="text-3xl font-black text-gray-900 tracking-tight">{listing.title}</h1>
             <ShareButton title={listing.title} />
           </div>
-          <p className="text-gray-500 mt-2">
-            {listing.outfitter_profiles?.business_name} · {listing.states?.join(', ')}
-            {avgRating && <span className="ml-3">⭐ {avgRating} ({reviews.length} reviews)</span>}
+          <p className="text-gray-500 mt-2 flex items-center gap-2 flex-wrap">
+            <span className="font-medium text-gray-700">{listing.outfitter_profiles?.business_name}</span>
+            <span className="text-gray-300">·</span>
+            <span>{listing.states?.join(', ')}</span>
+            {avgRating && (
+              <>
+                <span className="text-gray-300">·</span>
+                <span className="text-amber-500 font-semibold">★ {avgRating}</span>
+                <span className="text-gray-400">({reviews.length} {reviews.length === 1 ? 'review' : 'reviews'})</span>
+              </>
+            )}
           </p>
         </div>
 
         {/* ── Zone: gallery ── */}
         <PhotoGallery photos={listing.photos ?? []} />
+
+        {listing.video_url && (
+          <VideoEmbed url={listing.video_url} />
+        )}
 
         {/* ── Zone: main 2-col ── */}
         <div className="grid grid-cols-3 gap-8">
@@ -171,7 +207,12 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
             {/* ── Zone: details ── */}
             <div>
               <div className="grid grid-cols-2 gap-4 mb-5">
-                {([
+                {(isTrespass ? ([
+                  ['Duration', listing.duration_days ? `${listing.duration_days} days` : '—'],
+                  ['Group size', listing.group_size_max ? `${listing.group_size_min}–${listing.group_size_max} hunters` : `${listing.group_size_min}+ hunters`],
+                  ['Weapon types', listing.weapon_types?.join(', ') ?? '—'],
+                  ...(listing.acreage ? [['Acreage', `${listing.acreage.toLocaleString()} acres`]] : []),
+                ] as [string, string][]) : ([
                   ['Duration', listing.duration_days ? `${listing.duration_days} days` : '—'],
                   ['Group size', listing.group_size_max ? `${listing.group_size_min}–${listing.group_size_max} hunters` : `${listing.group_size_min}+ hunters`],
                   ['Lodging', listing.lodging_type ?? '—'],
@@ -180,13 +221,19 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
                   ['Weapon types', listing.weapon_types?.join(', ') ?? '—'],
                   ...(successRate ? [['Success rate', `${successRate}%`]] : []),
                   ...(listing.hunt_style ? [['Hunt style', listing.hunt_style]] : []),
-                ] as [string, string][]).map(([label, value]) => (
+                ] as [string, string][])).map(([label, value]) => (
                   <div key={label} className="bg-gray-50 rounded-xl p-4">
                     <div className="text-xs text-gray-500 uppercase tracking-wide mb-1">{label}</div>
                     <div className="font-medium text-gray-900 capitalize">{value}</div>
                   </div>
                 ))}
               </div>
+              {isTrespass && listing.geo_fuzzing_enabled && (
+                <div className="mt-3 flex items-center gap-2 text-sm text-gray-500">
+                  <span className="text-gray-400">📍</span>
+                  <span>Approx. location shown — exact coordinates provided after booking confirmed</span>
+                </div>
+              )}
 
               <div className="flex gap-2 flex-wrap">
                 {listing.ada_accessible && (
@@ -220,26 +267,26 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
           <div className="space-y-5">
 
             {/* Price + CTA */}
-            <div className="bg-white border border-gray-200 rounded-2xl p-6 sticky top-6">
-              <div className="text-3xl font-bold text-gray-900 mb-1">
+            <div className="bg-white border-2 border-gray-200 rounded-2xl p-6 sticky top-6 shadow-sm">
+              <div className="text-4xl font-black text-gray-900 mb-1 tracking-tight">
                 ${listing.base_price?.toLocaleString()}
               </div>
               {listing.deposit_amount && (
-                <div className="text-sm text-gray-500 mb-5">
+                <div className="text-sm text-gray-400 mb-5">
                   ${listing.deposit_amount?.toLocaleString()} deposit to book
                 </div>
               )}
               {user ? (
                 <Link
                   href={`/listings/${id}/book`}
-                  className="block w-full bg-[#1B4332] text-white text-center py-3 rounded-xl font-medium hover:bg-[#163828] transition-colors mb-4"
+                  className="block w-full bg-[#1B4332] text-white text-center py-3.5 rounded-xl font-black hover:bg-[#163828] transition-colors mb-3"
                 >
                   {listing.booking_type === 'instant' ? 'Book Now' : 'Request to Book'}
                 </Link>
               ) : (
                 <Link
                   href={`/signup?redirect=/listings/${id}/book`}
-                  className="block w-full bg-[#1B4332] text-white text-center py-3 rounded-xl font-medium hover:bg-[#163828] transition-colors mb-4"
+                  className="block w-full bg-[#1B4332] text-white text-center py-3.5 rounded-xl font-black hover:bg-[#163828] transition-colors mb-3"
                 >
                   Sign Up to Book
                 </Link>
@@ -291,7 +338,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
                 {listing.outfitter_profiles?.years_in_operation && (
                   <div>{listing.outfitter_profiles.years_in_operation} years in operation</div>
                 )}
-                {listing.outfitter_profiles?.guide_ratio && (
+                {!isTrespass && listing.outfitter_profiles?.guide_ratio && (
                   <div>Guide ratio: {listing.outfitter_profiles.guide_ratio}</div>
                 )}
                 {listing.outfitter_profiles?.response_time_hours && (

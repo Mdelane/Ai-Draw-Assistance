@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import Navbar from '@/components/Navbar'
+import TrespassLiabilityGate from '@/components/TrespassLiabilityGate'
 import { trackEvent, GA_EVENTS } from '@/lib/analytics'
 
 export default function BookingPage() {
@@ -15,6 +16,8 @@ export default function BookingPage() {
   const [listing, setListing] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [showLiabilityGate, setShowLiabilityGate] = useState(false)
+  const [trespassAccepted, setTrespassAccepted] = useState(false)
   const [form, setForm] = useState({
     start_date: '',
     end_date: '',
@@ -26,7 +29,7 @@ export default function BookingPage() {
     const supabase = createClient()
     supabase
       .from('listings')
-      .select('id, title, base_price, deposit_amount, duration_days, group_size_min, group_size_max, booking_type, outfitter_profiles(id, business_name)')
+      .select('id, title, base_price, deposit_amount, duration_days, group_size_min, group_size_max, booking_type, listing_type, outfitter_profiles(id, business_name)')
       .eq('id', listingId)
       .single()
       .then(({ data }) => {
@@ -45,8 +48,7 @@ export default function BookingPage() {
 
   const totalPrice = listing ? listing.base_price * form.party_size : 0
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
+  async function proceedWithBooking() {
     setLoading(true)
     setError(null)
 
@@ -79,6 +81,15 @@ export default function BookingPage() {
     router.push('/dashboard/bookings?booked=1')
   }
 
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (listing?.listing_type === 'trespass_fee' && !trespassAccepted) {
+      setShowLiabilityGate(true)
+      return
+    }
+    proceedWithBooking()
+  }
+
   if (!listing) return (
     <>
       <Navbar />
@@ -88,10 +99,20 @@ export default function BookingPage() {
 
   return (
     <>
+      {showLiabilityGate && (
+        <TrespassLiabilityGate
+          onAccept={() => {
+            setTrespassAccepted(true)
+            setShowLiabilityGate(false)
+            proceedWithBooking()
+          }}
+          onCancel={() => setShowLiabilityGate(false)}
+        />
+      )}
       <Navbar />
       <main className="max-w-lg mx-auto px-6 py-10">
         <Link href={`/listings/${listingId}`} className="text-sm text-gray-400 hover:text-gray-600 mb-6 block">← Back to listing</Link>
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">
+        <h1 className="text-2xl font-black tracking-tight text-gray-900 mb-1">
           {listing.booking_type === 'instant' ? 'Book this hunt' : 'Request to book'}
         </h1>
         <p className="text-gray-500 text-sm mb-8">{listing.title}</p>
@@ -107,7 +128,7 @@ export default function BookingPage() {
                 min={new Date().toISOString().split('T')[0]}
                 value={form.start_date}
                 onChange={e => setForm(f => ({ ...f, start_date: e.target.value }))}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
+                className="w-full border border-stone-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
               />
             </div>
             <div>
@@ -116,7 +137,7 @@ export default function BookingPage() {
                 type="date" required
                 value={form.end_date}
                 onChange={e => setForm(f => ({ ...f, end_date: e.target.value }))}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
+                className="w-full border border-stone-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
               />
             </div>
           </div>
@@ -131,7 +152,7 @@ export default function BookingPage() {
               max={listing.group_size_max ?? undefined}
               value={form.party_size}
               onChange={e => setForm(f => ({ ...f, party_size: parseInt(e.target.value) }))}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
+              className="w-full border border-stone-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
             />
           </div>
 
@@ -142,12 +163,12 @@ export default function BookingPage() {
               value={form.message}
               onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
               placeholder="Any questions or special requests..."
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
+              className="w-full border border-stone-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
             />
           </div>
 
           {/* Price summary */}
-          <div className="bg-gray-50 rounded-xl p-5 space-y-2 text-sm">
+          <div className="bg-stone-50 rounded-2xl border border-stone-200 p-5 space-y-2 text-sm">
             <div className="flex justify-between text-gray-600">
               <span>${listing.base_price?.toLocaleString()} × {form.party_size} hunter{form.party_size !== 1 ? 's' : ''}</span>
               <span>${totalPrice.toLocaleString()}</span>
@@ -158,7 +179,7 @@ export default function BookingPage() {
                 <span>${listing.deposit_amount?.toLocaleString()}</span>
               </div>
             )}
-            <div className="flex justify-between font-semibold text-gray-900 border-t border-gray-200 pt-2">
+            <div className="flex justify-between font-black text-gray-900 border-t border-gray-200 pt-2">
               <span>Total</span>
               <span>${totalPrice.toLocaleString()}</span>
             </div>
@@ -166,7 +187,7 @@ export default function BookingPage() {
 
           <button
             type="submit" disabled={loading}
-            className="w-full bg-[#1B4332] text-white py-3 rounded-xl font-medium hover:bg-[#163828] transition-colors disabled:opacity-50"
+            className="w-full bg-amber-400 text-black py-3 rounded-xl font-black hover:bg-amber-500 transition-colors disabled:opacity-50"
           >
             {loading ? 'Submitting...' : listing.booking_type === 'instant' ? 'Confirm booking' : 'Send request'}
           </button>

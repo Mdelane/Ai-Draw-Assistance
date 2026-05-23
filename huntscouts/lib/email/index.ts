@@ -1,6 +1,7 @@
 import { Resend } from 'resend'
 
 const FROM = 'HuntScouts <notifications@huntscouts.com>'
+const SCOUT_FROM = 'Scout AI <scout@huntscouts.com>'
 function getResend() { return new Resend(process.env.RESEND_API_KEY) }
 
 export async function sendBookingRequest({
@@ -141,5 +142,102 @@ export async function sendReviewRequest({
       <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/listings/${listingId}/review?booking=${bookingId}"><strong>Leave a review (takes 1 minute) →</strong></a></p>
       <p>— HuntScouts</p>
     `,
+  })
+}
+
+function unsubscribeFooter(userId: string) {
+  return `<p style="margin-top:32px;font-size:12px;color:#999;text-align:center">
+    <a href="${process.env.NEXT_PUBLIC_APP_URL}/api/email/unsubscribe?uid=${userId}" style="color:#999">Unsubscribe</a>
+  </p>`
+}
+
+function emailWrapper(content: string) {
+  return `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#f5f5f0;font-family:system-ui,sans-serif">
+    <div style="max-width:560px;margin:40px auto;background:#fff;border-radius:12px;padding:40px;box-sizing:border-box">
+      <div style="color:#1B4332;font-size:20px;font-weight:900;letter-spacing:-0.5px;margin-bottom:32px">HuntScouts</div>
+      ${content}
+    </div>
+  </body></html>`
+}
+
+export async function sendWelcomeEmail({
+  to, name, userId,
+}: { to: string; name: string; userId: string }) {
+  if (!process.env.RESEND_API_KEY) { console.warn('RESEND_API_KEY not set — skipping welcome email'); return }
+
+  await getResend().emails.send({
+    from: SCOUT_FROM,
+    to,
+    subject: 'Your AI Draw Strategy (And a warning about your points)',
+    html: emailWrapper(`
+      <p style="color:#333;font-size:16px;line-height:1.6">Hi ${name},</p>
+      <p style="color:#333;font-size:16px;line-height:1.6">You just joined HuntScouts — here's the thing most hunters get wrong about preference points:</p>
+      <p style="background:#f0f7f4;border-left:4px solid #1B4332;padding:16px 20px;border-radius:6px;color:#1B4332;font-size:16px;font-weight:700;line-height:1.5">
+        Most hunters wait too long. Point creep is real — units that required 4 points in 2018 require 9 in 2026.
+      </p>
+      <p style="color:#333;font-size:16px;line-height:1.6">Scout AI analyzes your specific point total against 15+ years of draw data to tell you exactly which units are still reachable — and which ones have become a dead zone.</p>
+      <div style="text-align:center;margin:32px 0">
+        <a href="${process.env.NEXT_PUBLIC_APP_URL}/account" style="display:inline-block;background:#1B4332;color:#fff;font-size:15px;font-weight:700;padding:14px 28px;border-radius:8px;text-decoration:none">
+          Build your Scout profile →
+        </a>
+      </div>
+      <p style="color:#888;font-size:14px;text-align:center;margin-top:-16px">It takes 2 minutes and unlocks your personalized draw strategy.</p>
+      ${unsubscribeFooter(userId)}
+    `),
+  })
+}
+
+export async function sendNurtureDay3({
+  to, name, userId,
+}: { to: string; name: string; userId: string }) {
+  if (!process.env.RESEND_API_KEY) { console.warn('RESEND_API_KEY not set — skipping nurture day 3 email'); return }
+
+  await getResend().emails.send({
+    from: SCOUT_FROM,
+    to,
+    subject: "The 'Unsuccessful' backup plan you don't have to stress about",
+    html: emailWrapper(`
+      <p style="color:#333;font-size:16px;line-height:1.6">Hi ${name},</p>
+      <p style="color:#333;font-size:16px;line-height:1.6">Most hunters who don't draw their tag spend the season watching YouTube hunts. Here's a better plan:</p>
+      <p style="color:#333;font-size:16px;line-height:1.6">HuntScouts has private land trespass fee hunts — no outfitter, no broker markup, no draw required. You pay the landowner directly for access to their property.</p>
+      <ul style="color:#333;font-size:16px;line-height:2;padding-left:20px">
+        <li>No draw application required</li>
+        <li>Often 50–70% cheaper than guided hunts</li>
+        <li>Book directly — no agency taking 15%</li>
+      </ul>
+      <div style="text-align:center;margin:32px 0">
+        <a href="${process.env.NEXT_PUBLIC_APP_URL}/listings?listing_type=trespass_fee" style="display:inline-block;background:#1B4332;color:#fff;font-size:15px;font-weight:700;padding:14px 28px;border-radius:8px;text-decoration:none">
+          Browse private land hunts →
+        </a>
+      </div>
+      ${unsubscribeFooter(userId)}
+    `),
+  })
+}
+
+export async function sendNurtureDay7({
+  to, name, userId,
+}: { to: string; name: string; userId: string }) {
+  if (!process.env.RESEND_API_KEY) { console.warn('RESEND_API_KEY not set — skipping nurture day 7 email'); return }
+
+  await getResend().emails.send({
+    from: SCOUT_FROM,
+    to,
+    subject: "Vetted ranches are booking up. Here's what's available.",
+    html: emailWrapper(`
+      <p style="color:#333;font-size:16px;line-height:1.6">Hi ${name},</p>
+      <p style="color:#333;font-size:16px;line-height:1.6">A quick update on what's available in the HuntScouts marketplace this week:</p>
+      <p style="color:#333;font-size:16px;line-height:1.6">We've been vetting outfitters and landowners across CO, WY, MT, UT, ID, AZ, and NV. Every listing goes through a license verification before going live.</p>
+      <p style="background:#f0f7f4;border-left:4px solid #1B4332;padding:16px 20px;border-radius:6px;color:#1B4332;font-size:16px;font-weight:700;line-height:1.5">
+        Hunters on HuntScouts save an average of $800 vs. traditional booking agents (no agency fee).
+      </p>
+      <div style="text-align:center;margin:32px 0">
+        <a href="${process.env.NEXT_PUBLIC_APP_URL}/listings" style="display:inline-block;background:#1B4332;color:#fff;font-size:15px;font-weight:700;padding:14px 28px;border-radius:8px;text-decoration:none">
+          View available hunts →
+        </a>
+      </div>
+      <p style="color:#555;font-size:15px;line-height:1.6;text-align:center">Most outfitters fill their dates 6–8 months out. Don't wait until your draw results come back.</p>
+      ${unsubscribeFooter(userId)}
+    `),
   })
 }

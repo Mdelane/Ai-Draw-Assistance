@@ -53,7 +53,7 @@ export default function ReviewsSection({ reviews, outfitterName }: Props) {
   if (reviews.length === 0) {
     return (
       <div>
-        <h2 className="text-xl font-bold text-gray-900 mb-3">Reviews</h2>
+        <h2 className="text-xl font-black text-gray-900 tracking-tight mb-3">Reviews</h2>
         <p className="text-gray-400 text-sm">No reviews yet — be the first!</p>
       </div>
     )
@@ -61,7 +61,7 @@ export default function ReviewsSection({ reviews, outfitterName }: Props) {
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-gray-900 mb-5">
+      <h2 className="text-xl font-black text-gray-900 tracking-tight mb-5">
         Reviews{' '}
         <span className="font-normal text-gray-400 text-base">
           · ⭐ {avgRating.toFixed(1)} ({reviews.length})
@@ -71,7 +71,7 @@ export default function ReviewsSection({ reviews, outfitterName }: Props) {
       {/* Summary + distribution */}
       <div className="flex gap-8 mb-6">
         <div className="text-center shrink-0">
-          <div className="text-5xl font-bold text-gray-900">{avgRating.toFixed(1)}</div>
+          <div className="text-5xl font-black text-gray-900">{avgRating.toFixed(1)}</div>
           <div className="text-yellow-500 text-lg mt-1">
             {'★'.repeat(Math.round(avgRating))}{'☆'.repeat(5 - Math.round(avgRating))}
           </div>
@@ -81,7 +81,7 @@ export default function ReviewsSection({ reviews, outfitterName }: Props) {
           {dist.map(({ star, count }) => (
             <div key={star} className="flex items-center gap-2 text-sm">
               <span className="w-2 text-gray-500 shrink-0">{star}</span>
-              <div className="flex-1 bg-gray-100 rounded-full h-2">
+              <div className="flex-1 bg-stone-100 rounded-full h-2">
                 <div
                   className="bg-yellow-400 h-2 rounded-full"
                   style={{ width: reviews.length ? `${(count / reviews.length) * 100}%` : '0%' }}
@@ -144,7 +144,7 @@ export default function ReviewsSection({ reviews, outfitterName }: Props) {
       {/* Review cards */}
       <div className="space-y-4">
         {visible.map(r => (
-          <div key={r.id} className="border border-gray-200 rounded-xl p-5">
+          <div key={r.id} className="border border-stone-200 rounded-2xl p-5">
             <div className="flex items-start justify-between mb-1">
               <div>
                 <span className="font-medium text-gray-900">{r.users?.full_name ?? 'Verified Hunter'}</span>
@@ -163,7 +163,7 @@ export default function ReviewsSection({ reviews, outfitterName }: Props) {
             </p>
             {r.body && <p className="text-gray-600 text-sm leading-relaxed">{r.body}</p>}
             {r.outfitter_response && (
-              <div className="mt-3 bg-gray-50 rounded-lg p-3 border-l-2 border-[#1B4332]">
+              <div className="mt-3 bg-stone-50 rounded-xl p-3 border-l-2 border-[#1B4332]">
                 <p className="text-xs font-medium text-gray-700 mb-1">{outfitterName} responded:</p>
                 <p className="text-sm text-gray-600">{r.outfitter_response}</p>
               </div>
@@ -175,7 +175,7 @@ export default function ReviewsSection({ reviews, outfitterName }: Props) {
       {hasMore && (
         <button
           onClick={() => setPage(p => p + 1)}
-          className="mt-4 w-full border border-gray-300 rounded-xl py-2.5 text-sm text-gray-600 hover:border-gray-400 hover:text-gray-900 transition-colors"
+          className="mt-4 w-full border border-stone-300 rounded-xl py-2.5 text-sm text-gray-600 hover:border-stone-400 hover:text-gray-900 transition-colors"
         >
           Show more reviews
         </button>

@@ -42,7 +42,7 @@ const TOTAL_STEPS = 8
 function ProgressBar({ step }: { step: number }) {
   return (
     <div className="flex items-center gap-2 mb-8">
-      <div className="flex-1 bg-gray-100 rounded-full h-1.5">
+      <div className="flex-1 bg-stone-100 rounded-full h-1.5">
         <div
           className="h-1.5 rounded-full bg-[#1B4332] transition-all duration-300"
           style={{ width: `${(step / TOTAL_STEPS) * 100}%` }}
@@ -61,7 +61,7 @@ function OptionCard({ label, selected, onClick }: { label: string; selected: boo
       className={`w-full text-left px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all ${
         selected
           ? 'border-[#1B4332] bg-[#1B4332] text-white'
-          : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+          : 'border-stone-200 bg-white text-gray-700 hover:border-stone-300'
       }`}
     >
       {label}
@@ -152,14 +152,14 @@ export default function ScoutOnboarding({ onComplete, onDismiss }: { onComplete:
       <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl max-w-lg w-full p-8 text-center">
           <div className="text-5xl mb-4">🎯</div>
-          <h2 className="text-2xl font-bold text-[#1B4332] mb-3">Build your Scout profile</h2>
+          <h2 className="text-2xl font-black text-gray-900 tracking-tight mb-3">Build your Scout profile</h2>
           <p className="text-gray-500 mb-2">
             The more we know about your points, goals, and preferences, the better your AI recommendations will be.
           </p>
           <p className="text-gray-400 text-sm mb-8">Takes about 2 minutes. Every question is optional.</p>
           <button
             onClick={() => setStep(1)}
-            className="w-full bg-[#1B4332] text-white py-3 rounded-xl font-medium hover:bg-[#163828] transition-colors mb-3"
+            className="w-full bg-amber-400 text-black py-3 rounded-xl font-black hover:bg-amber-300 transition-colors mb-3"
           >
             Let's go →
           </button>
@@ -182,7 +182,7 @@ export default function ScoutOnboarding({ onComplete, onDismiss }: { onComplete:
         {/* Step 1: Experience + Home State */}
         {step === 1 && (
           <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-1">How experienced are you?</h2>
+            <h2 className="text-xl font-black text-gray-900 tracking-tight mb-1">How experienced are you?</h2>
             <p className="text-gray-400 text-sm mb-6">This helps Scout calibrate its advice.</p>
             <div className="space-y-3 mb-6">
               {[
@@ -210,11 +210,11 @@ export default function ScoutOnboarding({ onComplete, onDismiss }: { onComplete:
         {/* Step 2: Points Inventory */}
         {step === 2 && (
           <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-1">What tags are you applying for?</h2>
+            <h2 className="text-xl font-black text-gray-900 tracking-tight mb-1">What tags are you applying for?</h2>
             <p className="text-gray-400 text-sm mb-6">Add every state, species, and weapon combo you have points in. Scout will know which tags are yours.</p>
             <div className="space-y-4 mb-4">
               {points.map((entry, i) => (
-                <div key={entry.id} className="border border-gray-200 rounded-xl p-4">
+                <div key={entry.id} className="border border-stone-200 rounded-2xl p-4">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-sm font-medium text-gray-700">Tag #{i + 1}</span>
                     <div className="flex items-center gap-3">
@@ -264,7 +264,7 @@ export default function ScoutOnboarding({ onComplete, onDismiss }: { onComplete:
                 </div>
               ))}
             </div>
-            <button type="button" onClick={addPointsEntry} className="w-full border-2 border-dashed border-gray-200 rounded-xl py-3 text-sm text-gray-400 hover:border-gray-300 hover:text-gray-500 transition-colors">
+            <button type="button" onClick={addPointsEntry} className="w-full border-2 border-dashed border-stone-200 rounded-xl py-3 text-sm text-gray-400 hover:border-stone-300 hover:text-gray-500 transition-colors">
               + Add a tag
             </button>
           </div>
@@ -273,7 +273,7 @@ export default function ScoutOnboarding({ onComplete, onDismiss }: { onComplete:
         {/* Step 3: Strategy */}
         {step === 3 && (
           <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-1">How do you approach your points?</h2>
+            <h2 className="text-xl font-black text-gray-900 tracking-tight mb-1">How do you approach your points?</h2>
             <p className="text-gray-400 text-sm mb-6">This shapes how Scout balances odds vs. waiting.</p>
             <div className="space-y-3 mb-8">
               {[
@@ -284,7 +284,7 @@ export default function ScoutOnboarding({ onComplete, onDismiss }: { onComplete:
                 <OptionCard key={o.value} label={o.label} selected={profile.strategy === o.value} onClick={() => setProfile(p => ({ ...p, strategy: o.value }))} />
               ))}
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-1">Timeline goal</h2>
+            <h2 className="text-xl font-black text-gray-900 tracking-tight mb-1">Timeline goal</h2>
             <p className="text-gray-400 text-sm mb-4">When do you want to draw?</p>
             <div className="space-y-3">
               {[
@@ -301,7 +301,7 @@ export default function ScoutOnboarding({ onComplete, onDismiss }: { onComplete:
         {/* Step 4: Preferences */}
         {step === 4 && (
           <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-1">Hunt preferences</h2>
+            <h2 className="text-xl font-black text-gray-900 tracking-tight mb-1">Hunt preferences</h2>
             <p className="text-gray-400 text-sm mb-6">Skip anything that doesn't apply.</p>
 
             <label className="text-sm font-medium text-gray-700 block mb-2">Terrain preference</label>
@@ -354,7 +354,7 @@ export default function ScoutOnboarding({ onComplete, onDismiss }: { onComplete:
         {/* Step 5: Group hunting */}
         {step === 5 && (
           <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-1">Are you hunting alone or with a group?</h2>
+            <h2 className="text-xl font-black text-gray-900 tracking-tight mb-1">Are you hunting alone or with a group?</h2>
             <p className="text-gray-400 text-sm mb-6">Group applications need everyone to draw the same unit — Scout factors this in.</p>
             <div className="space-y-3 mb-6">
               <OptionCard label="Solo — just me" selected={!profile.group_hunting} onClick={() => setProfile(p => ({ ...p, group_hunting: false, group_size: null }))} />
@@ -378,7 +378,7 @@ export default function ScoutOnboarding({ onComplete, onDismiss }: { onComplete:
         {/* Step 6: Goals */}
         {step === 6 && (
           <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-1">What are you hunting for?</h2>
+            <h2 className="text-xl font-black text-gray-900 tracking-tight mb-1">What are you hunting for?</h2>
             <p className="text-gray-400 text-sm mb-6">Trophy quality vs. odds vs. filling the freezer — Scout will weigh them accordingly.</p>
             <div className="space-y-3 mb-8">
               {[
@@ -390,7 +390,7 @@ export default function ScoutOnboarding({ onComplete, onDismiss }: { onComplete:
               ))}
             </div>
 
-            <h2 className="text-xl font-bold text-gray-900 mb-4">A couple more quick ones</h2>
+            <h2 className="text-xl font-black text-gray-900 tracking-tight mb-4">A couple more quick ones</h2>
             <div className="space-y-4">
               <div>
                 <p className="text-sm font-medium text-gray-700 mb-2">Have you ever drawn this species before?</p>
@@ -413,7 +413,7 @@ export default function ScoutOnboarding({ onComplete, onDismiss }: { onComplete:
         {/* Step 7: Physical */}
         {step === 7 && (
           <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-1">Any physical considerations?</h2>
+            <h2 className="text-xl font-black text-gray-900 tracking-tight mb-1">Any physical considerations?</h2>
             <p className="text-gray-400 text-sm mb-6">Scout can steer you away from units that require extreme hiking if needed.</p>
             <textarea
               value={profile.physical_limitations}
@@ -428,7 +428,7 @@ export default function ScoutOnboarding({ onComplete, onDismiss }: { onComplete:
         {/* Step 8: Alerts */}
         {step === 8 && (
           <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-1">Stay in the loop</h2>
+            <h2 className="text-xl font-black text-gray-900 tracking-tight mb-1">Stay in the loop</h2>
             <p className="text-gray-400 text-sm mb-6">We'll notify you when it matters — never spam.</p>
             <div className="space-y-4">
               <label className="flex items-start gap-3 cursor-pointer">

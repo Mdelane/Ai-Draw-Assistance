@@ -24,9 +24,14 @@ export default async function OutfitterOnboarding() {
       <Navbar />
       <main className="max-w-lg mx-auto px-6 py-12">
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-[#1B4332] mb-2">Welcome to HuntScouts</h1>
+          {foundingOutfitter && (
+            <span className="inline-block bg-amber-100 text-amber-800 text-xs font-black uppercase tracking-widest px-3 py-1 rounded-full mb-4">
+              Founding Outfitter — 7% commission locked in
+            </span>
+          )}
+          <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Welcome to HuntScouts</h1>
           {foundingOutfitter ? (
-            <p className="text-amber-700 font-medium">You&apos;re a Founding Outfitter — locked in at 7% commission</p>
+            <p className="text-gray-500">You&apos;re early. Let&apos;s get your profile set up so you can start taking bookings.</p>
           ) : (
             <p className="text-gray-500">Set up your outfitter profile to start listing hunts.</p>
           )}

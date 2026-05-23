@@ -84,6 +84,19 @@ export async function POST(req: NextRequest) {
 
   const scoredUnits = await scoreUnits(state, species, weaponType, points, year, DEFAULT_WEIGHTS)
 
+  const { data: regulatoryOverrides } = await supabase
+    .from('state_regulatory_overrides')
+    .select('rule_type, rule_value, display_note, species, weapon_type')
+    .eq('state', state)
+    .or(`species.is.null,species.eq.${species}`)
+
+  const regulatoryNotesBlock =
+    regulatoryOverrides && regulatoryOverrides.length > 0
+      ? `STATE REGULATORY NOTES FOR ${state.toUpperCase()}:\n${regulatoryOverrides
+          .map((r: any) => `- ${r.display_note ?? r.rule_value}`)
+          .join('\n')}`
+      : ''
+
   // Free queries only see the top unit so the full list stays behind the paywall
   const unitsForPrompt = !paid && isFreeQuery ? scoredUnits.slice(0, 1) : scoredUnits
 
@@ -102,6 +115,8 @@ export async function POST(req: NextRequest) {
     ? `\n\nIMPORTANT: Give the hunter a complete, helpful answer for their top unit only. End your response with this exact sentence on its own line: "Subscribe to Scout Pro to see all your unit options, full draw strategy, and multi-year projections."`
     : ''
 
+  const hasUnitContext = unitsForPrompt.some((u: any) => u.trophy_quality != null)
+
   const systemPrompt = `You are a western big game draw strategy expert for HuntScouts.
 
 The hunter has ${points} preference points for ${species} in ${state} with a ${weaponType} tag for the ${year} season.
@@ -110,13 +125,22 @@ Here are their top scored units based on draw odds, trophy quality, and public l
 
 ${JSON.stringify(unitsForPrompt, null, 2)}
 
+${hasUnitContext ? `Unit context fields:
+- trophy_quality: 1 (low) to 5 (top destination)
+- public_land_percent: % of unit that is publicly accessible
+- access_type: how hunters typically reach the unit
+- terrain: general landscape type
+- notes: key things a hunter should know about this unit` : ''}
+${regulatoryNotesBlock ? `\n${regulatoryNotesBlock}\n` : ''}
 Rules:
 - Only reference unit numbers and statistics from the data above. Never invent unit numbers or odds.
 - Give specific, actionable advice. Reference unit numbers directly.
-- For multi-year strategy, use the projection data provided.
-- Explain tradeoffs clearly — odds vs trophy quality vs points burn.
+- For multi-year strategy, use the projection data and trend fields.
+- Explain tradeoffs clearly — odds vs trophy quality vs points burn vs access difficulty.
 - If asked "what if I wait", calculate using the plus1yr/plus2yr/plus3yr projections.
-- Keep responses concise and direct. Hunters want answers, not disclaimers.${freeQueryFooter}`
+- When unit notes are available, weave in the practical details hunters care about (access, terrain, what to expect).
+- Keep responses concise and direct. Hunters want answers, not disclaimers.
+- Always surface relevant regulatory notes when they apply to the user's question. E.g., if a user asks about points, mention whether the state uses preference vs bonus points.${freeQueryFooter}`
 
   const stream = await anthropic.messages.stream({
     model: 'claude-sonnet-4-20250514',

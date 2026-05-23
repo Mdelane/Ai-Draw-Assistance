@@ -4,7 +4,8 @@ import { requireUser } from '@/lib/auth/requireUser'
 import { createAdminClient } from '@/lib/supabase/server'
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+  if (!process.env.STRIPE_SECRET_KEY) return NextResponse.json({ error: 'Payments not yet configured' }, { status: 503 })
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
   const { id: bookingId } = await params
 
   let userCtx: Awaited<ReturnType<typeof requireUser>>

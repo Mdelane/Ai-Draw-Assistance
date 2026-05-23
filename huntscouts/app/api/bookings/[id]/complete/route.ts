@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
 export async function POST(
@@ -35,6 +35,25 @@ export async function POST(
     .eq('id', id)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  const adminSupabase = await createAdminClient()
+  const { data: outfitterProfile } = await adminSupabase
+    .from('outfitter_profiles')
+    .select('id, bookings_completed_count, pilot_bookings_remaining')
+    .eq('id', booking.outfitter_id)
+    .single()
+
+  if (outfitterProfile) {
+    const newCount = (outfitterProfile.bookings_completed_count ?? 0) + 1
+    const newPilot = Math.max(0, (outfitterProfile.pilot_bookings_remaining ?? 0) - 1)
+    await adminSupabase
+      .from('outfitter_profiles')
+      .update({
+        bookings_completed_count: newCount,
+        pilot_bookings_remaining: newPilot,
+      })
+      .eq('id', outfitterProfile.id)
+  }
 
   return NextResponse.json({ ok: true })
 }

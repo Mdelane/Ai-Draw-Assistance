@@ -39,10 +39,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         <Link href="/blog" className="text-sm text-gray-400 hover:text-gray-600 mb-8 block">← All articles</Link>
 
         <div className="mb-8">
-          <span className="inline-block bg-green-50 text-green-800 text-xs font-semibold px-2.5 py-1 rounded-full mb-4">
+          <span className="inline-block bg-green-50 text-green-800 text-xs font-bold uppercase tracking-widest px-2.5 py-1 rounded-full mb-4">
             {post.category}
           </span>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4 leading-tight">{post.title}</h1>
+          <h1 className="text-4xl font-black text-gray-900 mb-4 leading-tight tracking-tight">{post.title}</h1>
           <p className="text-gray-500 text-lg mb-5">{post.description}</p>
           <div className="flex items-center gap-3 text-sm text-gray-400 border-b border-gray-100 pb-6">
             <span>{post.author}</span>
@@ -54,7 +54,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         </div>
 
         <div className="prose prose-gray max-w-none
-          prose-headings:font-bold prose-headings:text-gray-900
+          prose-headings:font-black prose-headings:text-gray-900 prose-headings:tracking-tight
           prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4
           prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
           prose-p:text-gray-600 prose-p:leading-relaxed
@@ -69,9 +69,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
         <div className="mt-16 pt-8 border-t border-gray-100">
           <div className="bg-[#1B4332] text-white rounded-2xl p-8 text-center">
-            <h3 className="text-xl font-bold mb-2">Get AI draw strategy for free</h3>
+            <h3 className="text-xl font-black tracking-tight mb-2">Get AI draw strategy for free</h3>
             <p className="text-green-200 mb-5">Check draw odds and run Scout AI queries for {new Date().getFullYear()} applications.</p>
-            <Link href="/scout" className="inline-block bg-white text-[#1B4332] px-6 py-2.5 rounded-lg font-medium hover:bg-green-50 transition-colors">
+            <Link href="/scout" className="inline-block bg-amber-400 text-black px-6 py-2.5 rounded-xl font-black hover:bg-amber-300 transition-colors">
               Try Scout →
             </Link>
           </div>

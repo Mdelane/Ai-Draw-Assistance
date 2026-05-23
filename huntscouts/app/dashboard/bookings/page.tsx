@@ -4,6 +4,13 @@ import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import PayDepositButton from './PayDepositButton'
 
+const STATUS_STYLES: Record<string, string> = {
+  confirmed: 'bg-green-100 text-green-700',
+  pending: 'bg-amber-100 text-amber-700',
+  cancelled: 'bg-red-100 text-red-700',
+  completed: 'bg-blue-100 text-blue-700',
+}
+
 export default async function HunterBookings({ searchParams }: { searchParams: Promise<{ booked?: string; paid?: string }> }) {
   const params = await searchParams
   const supabase = await createClient()
@@ -20,18 +27,24 @@ export default async function HunterBookings({ searchParams }: { searchParams: P
     <>
       <Navbar />
       <main className="max-w-3xl mx-auto px-6 py-10">
+
         <div className="mb-8">
-          <Link href="/dashboard" className="text-gray-400 hover:text-gray-600 text-sm">← Dashboard</Link>
+          <Link href="/dashboard" className="text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-gray-600 transition-colors">
+            ← Dashboard
+          </Link>
         </div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">My bookings</h1>
+
+        <h1 className="text-3xl font-black text-gray-900 tracking-tight mb-8">My bookings</h1>
 
         {params.booked === '1' && (
-          <div className="bg-green-50 text-green-700 text-sm rounded-lg px-4 py-3 mb-6">
+          <div className="bg-green-50 border border-green-200 text-green-800 text-sm rounded-xl px-5 py-4 mb-6 flex items-center gap-3">
+            <span className="text-lg">✓</span>
             Request sent! The outfitter will respond within 48 hours.
           </div>
         )}
         {params.paid === '1' && (
-          <div className="bg-green-50 text-green-700 text-sm rounded-lg px-4 py-3 mb-6">
+          <div className="bg-green-50 border border-green-200 text-green-800 text-sm rounded-xl px-5 py-4 mb-6 flex items-center gap-3">
+            <span className="text-lg">✓</span>
             Deposit paid — your spot is secured!
           </div>
         )}
@@ -39,35 +52,35 @@ export default async function HunterBookings({ searchParams }: { searchParams: P
         {bookings && bookings.length > 0 ? (
           <div className="space-y-4">
             {bookings.map((b: any) => (
-              <div key={b.id} className="bg-white border border-gray-200 rounded-xl p-5">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <div className="font-semibold text-gray-900">{b.listings?.title}</div>
-                    <div className="text-sm text-gray-500 mt-0.5">{b.listings?.outfitter_profiles?.business_name}</div>
-                    <div className="text-sm text-gray-500 mt-1">{b.start_date} – {b.end_date} · Party of {b.party_size}</div>
+              <div key={b.id} className="bg-white border border-gray-200 rounded-2xl p-6">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold text-gray-900 text-base mb-0.5 truncate">{b.listings?.title}</div>
+                    <div className="text-sm text-gray-500">{b.listings?.outfitter_profiles?.business_name}</div>
+                    <div className="text-sm text-gray-400 mt-2">
+                      {new Date(b.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} –{' '}
+                      {new Date(b.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      {' · '}{b.party_size} {b.party_size === 1 ? 'hunter' : 'hunters'}
+                    </div>
                     {b.status === 'completed' && (
                       <Link
                         href={`/listings/${b.listing_id}/review?booking=${b.id}`}
-                        className="mt-2 inline-block text-xs text-[#1B4332] font-medium hover:underline"
+                        className="mt-3 inline-block text-xs font-bold text-[#1B4332] hover:underline"
                       >
                         Leave a review →
                       </Link>
                     )}
                   </div>
+
                   <div className="text-right shrink-0">
-                    <div className="font-semibold text-gray-900">${b.total_price?.toLocaleString()}</div>
-                    <span className={`mt-1 inline-block text-xs font-medium px-2.5 py-1 rounded-full ${
-                      b.status === 'confirmed' ? 'bg-green-100 text-green-700' :
-                      b.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                      b.status === 'cancelled' ? 'bg-red-100 text-red-700' :
-                      b.status === 'completed' ? 'bg-blue-100 text-blue-700' :
-                      'bg-gray-100 text-gray-600'
-                    }`}>
+                    <div className="font-black text-gray-900 text-lg mb-1">${b.total_price?.toLocaleString()}</div>
+                    <span className={`inline-block text-xs font-bold px-2.5 py-1 rounded-full capitalize ${STATUS_STYLES[b.status] ?? 'bg-gray-100 text-gray-600'}`}>
                       {b.status}
                     </span>
+
                     {b.status === 'confirmed' && !b.deposit_paid && b.deposit_amount && (
-                      <div>
-                        <div className="text-xs text-orange-600 mt-1">
+                      <div className="mt-3">
+                        <div className="text-xs font-semibold text-amber-600 mb-1.5">
                           ${b.deposit_amount.toLocaleString()} deposit due
                         </div>
                         <PayDepositButton bookingId={b.id} />
@@ -79,9 +92,12 @@ export default async function HunterBookings({ searchParams }: { searchParams: P
             ))}
           </div>
         ) : (
-          <div className="bg-gray-50 border border-dashed border-gray-200 rounded-xl p-12 text-center">
-            <p className="text-gray-400 text-sm mb-3">No bookings yet</p>
-            <Link href="/listings" className="text-[#1B4332] font-medium text-sm hover:underline">Browse hunts</Link>
+          <div className="bg-stone-50 border-2 border-dashed border-stone-200 rounded-2xl p-14 text-center">
+            <div className="text-4xl mb-3">🦌</div>
+            <p className="text-gray-400 text-sm mb-4">No bookings yet</p>
+            <Link href="/listings" className="inline-block bg-[#1B4332] text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-[#163828] transition-colors">
+              Browse Guided Hunts
+            </Link>
           </div>
         )}
       </main>

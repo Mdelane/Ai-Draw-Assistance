@@ -88,6 +88,10 @@ export default function EditListingPage() {
       cancellation_policy: form.cancellation_policy ?? 'moderate',
       unit: form.unit || null,
       is_active: form.is_active,
+      listing_type: form.listing_type ?? 'guided_hunt',
+      acreage: form.acreage ? parseInt(form.acreage) : null,
+      geo_fuzzing_enabled: form.geo_fuzzing_enabled ?? true,
+      priority_access: form.priority_access ?? false,
     }).eq('id', listingId)
 
     if (error) { setError(error.message); setSaving(false); return }
@@ -106,7 +110,7 @@ export default function EditListingPage() {
       <Navbar />
       <main className="max-w-2xl mx-auto px-6 py-10">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Edit listing</h1>
+          <h1 className="text-2xl font-black tracking-tight text-gray-900">Edit listing</h1>
           <div className="flex items-center gap-3">
             <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
               <input
@@ -123,6 +127,26 @@ export default function EditListingPage() {
 
         <form onSubmit={handleSubmit} className="space-y-7">
           {error && <div className="bg-red-50 text-red-700 text-sm rounded-lg px-4 py-3">{error}</div>}
+
+          {/* Listing type */}
+          <div>
+            <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-1.5">Listing type</p>
+            <div className="grid grid-cols-3 gap-3">
+              {([['guided_hunt', 'Guided Hunt'], ['trespass_fee', 'Trespass Fee'], ['private_land', 'Private Land']] as const).map(([val, label]) => (
+                <button
+                  key={val} type="button"
+                  onClick={() => setForm((f: any) => ({ ...f, listing_type: val }))}
+                  className={`py-3 rounded-lg border text-sm font-medium transition-colors ${
+                    (form.listing_type ?? 'guided_hunt') === val
+                      ? 'bg-[#1B4332] text-white border-[#1B4332]'
+                      : 'bg-white text-gray-700 border-gray-300 hover:border-[#1B4332]'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
 
           <Field label="Title">
             <input type="text" required value={form.title} onChange={e => setForm((f: any) => ({ ...f, title: e.target.value }))} className={input} />
@@ -147,12 +171,14 @@ export default function EditListingPage() {
           </Field>
 
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Hunt style">
-              <select value={form.hunt_style ?? ''} onChange={e => setForm((f: any) => ({ ...f, hunt_style: e.target.value }))} className={input}>
-                <option value="">Select...</option>
-                {['spot-and-stalk', 'stand hunting', 'calling', 'dog hunting'].map(o => <option key={o}>{o}</option>)}
-              </select>
-            </Field>
+            {(form.listing_type ?? 'guided_hunt') === 'guided_hunt' && (
+              <Field label="Hunt style">
+                <select value={form.hunt_style ?? ''} onChange={e => setForm((f: any) => ({ ...f, hunt_style: e.target.value }))} className={input}>
+                  <option value="">Select...</option>
+                  {['spot-and-stalk', 'stand hunting', 'calling', 'dog hunting'].map(o => <option key={o}>{o}</option>)}
+                </select>
+              </Field>
+            )}
             <Field label="Access type">
               <select value={form.access_type ?? ''} onChange={e => setForm((f: any) => ({ ...f, access_type: e.target.value }))} className={input}>
                 <option value="">Select...</option>
@@ -180,12 +206,14 @@ export default function EditListingPage() {
             </Field>
           </div>
 
-          <Field label="Lodging type">
-            <select value={form.lodging_type ?? ''} onChange={e => setForm((f: any) => ({ ...f, lodging_type: e.target.value }))} className={input}>
-              <option value="">Select...</option>
-              {['spike camp', 'tent camp', 'wall tent', 'lodge', 'ranch house', 'cabin'].map(o => <option key={o}>{o}</option>)}
-            </select>
-          </Field>
+          {(form.listing_type ?? 'guided_hunt') === 'guided_hunt' && (
+            <Field label="Lodging type">
+              <select value={form.lodging_type ?? ''} onChange={e => setForm((f: any) => ({ ...f, lodging_type: e.target.value }))} className={input}>
+                <option value="">Select...</option>
+                {['spike camp', 'tent camp', 'wall tent', 'lodge', 'ranch house', 'cabin'].map(o => <option key={o}>{o}</option>)}
+              </select>
+            </Field>
+          )}
 
           <div className="grid grid-cols-2 gap-4">
             <Field label="Base price ($)">
@@ -201,13 +229,21 @@ export default function EditListingPage() {
           </Field>
 
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Success rate override (%)">
-              <input type="number" min={0} max={100} value={form.success_rate_override} onChange={e => setForm((f: any) => ({ ...f, success_rate_override: e.target.value }))} className={input} placeholder="Optional" />
-            </Field>
+            {(form.listing_type ?? 'guided_hunt') === 'guided_hunt' && (
+              <Field label="Success rate override (%)">
+                <input type="number" min={0} max={100} value={form.success_rate_override} onChange={e => setForm((f: any) => ({ ...f, success_rate_override: e.target.value }))} className={input} placeholder="Optional" />
+              </Field>
+            )}
             <Field label="Unit number">
               <input type="text" value={form.unit ?? ''} onChange={e => setForm((f: any) => ({ ...f, unit: e.target.value }))} className={input} placeholder="Optional" />
             </Field>
           </div>
+
+          {((form.listing_type ?? 'guided_hunt') === 'trespass_fee' || (form.listing_type ?? 'guided_hunt') === 'private_land') && (
+            <Field label="Acreage">
+              <input type="number" min={0} value={form.acreage ?? ''} onChange={e => setForm((f: any) => ({ ...f, acreage: e.target.value }))} className={input} placeholder="e.g. 640" />
+            </Field>
+          )}
 
           <div className="space-y-3">
             {([['is_combination_hunt', 'Combination hunt'], ['ada_accessible', 'ADA accessible'], ['points_required', 'Draw tag required']] as const).map(([field, label]) => (
@@ -216,6 +252,16 @@ export default function EditListingPage() {
                 <span className="text-sm text-gray-700">{label}</span>
               </label>
             ))}
+            {((form.listing_type ?? 'guided_hunt') === 'trespass_fee' || (form.listing_type ?? 'guided_hunt') === 'private_land') && (
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" checked={form.geo_fuzzing_enabled ?? true} onChange={e => setForm((f: any) => ({ ...f, geo_fuzzing_enabled: e.target.checked }))} className="w-4 h-4 accent-[#1B4332]" />
+                <span className="text-sm text-gray-700">Enable location fuzzing — show county only, not exact coordinates</span>
+              </label>
+            )}
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input type="checkbox" checked={form.priority_access ?? false} onChange={e => setForm((f: any) => ({ ...f, priority_access: e.target.checked }))} className="w-4 h-4 accent-[#1B4332]" />
+              <span className="text-sm text-gray-700">Priority listing — Scout Pro subscribers get first access</span>
+            </label>
           </div>
 
           <Field label="Booking type">
@@ -258,7 +304,7 @@ export default function EditListingPage() {
             <p className="text-xs text-gray-400 mt-2">Platform minimum: all policies must offer at least a 50% refund when hunters cancel 60+ days out.</p>
           </Field>
 
-          <button type="submit" disabled={saving} className="w-full bg-[#1B4332] text-white py-3 rounded-lg font-medium hover:bg-[#163828] transition-colors disabled:opacity-50">
+          <button type="submit" disabled={saving} className="w-full bg-amber-400 text-black py-3 rounded-lg font-black hover:bg-amber-500 transition-colors disabled:opacity-50">
             {saving ? 'Saving...' : 'Save changes'}
           </button>
         </form>
@@ -267,7 +313,7 @@ export default function EditListingPage() {
   )
 }
 
-const input = 'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]'
+const input = 'w-full border border-stone-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]'
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return <div><label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>{children}</div>
 }

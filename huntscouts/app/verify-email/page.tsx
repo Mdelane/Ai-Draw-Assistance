@@ -17,7 +17,7 @@ export default async function VerifyEmailPage() {
       <Navbar />
       <main className="max-w-md mx-auto px-6 py-20 text-center">
         <div className="text-5xl mb-6">📬</div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-3">Check your inbox</h1>
+        <h1 className="text-2xl font-black tracking-tight text-gray-900 mb-3">Check your inbox</h1>
         <p className="text-gray-600 mb-2">
           We sent a confirmation link to <strong>{user?.email}</strong>
         </p>

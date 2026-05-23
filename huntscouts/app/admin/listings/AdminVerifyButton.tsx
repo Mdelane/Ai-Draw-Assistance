@@ -20,7 +20,7 @@ export default function AdminVerifyButton({ outfitterId }: { outfitterId: string
     <button
       onClick={verify}
       disabled={loading}
-      className="text-xs bg-[#1B4332] text-white px-3 py-1.5 rounded-lg font-medium hover:bg-[#163828] disabled:opacity-50 transition-colors"
+      className="text-xs bg-amber-400 text-black px-3 py-1.5 rounded-xl font-black hover:bg-amber-500 disabled:opacity-50 transition-colors"
     >
       {loading ? '...' : 'Verify'}
     </button>

@@ -117,9 +117,9 @@ export default function ScoutChat({ pointsCombos, isPro, freeQueryUsed, emailVer
   // Tag selector screen
   if (showTagSelector || !selectedTag) {
     return (
-      <div className="border border-gray-200 rounded-2xl overflow-hidden">
+      <div className="border border-stone-200 rounded-2xl overflow-hidden">
         <div className="bg-[#1B4332] text-white px-6 py-4">
-          <h2 className="font-semibold text-lg">Scout AI</h2>
+          <h2 className="font-black text-lg tracking-tight">Scout AI</h2>
           <p className="text-green-200 text-sm">Which tag are we working on today?</p>
         </div>
         <div className="p-6">
@@ -134,16 +134,16 @@ export default function ScoutChat({ pointsCombos, isPro, freeQueryUsed, emailVer
                 <button
                   key={tag.id}
                   onClick={() => selectTag(tag)}
-                  className="w-full text-left border border-gray-200 rounded-xl px-5 py-4 hover:border-[#1B4332] hover:bg-green-50 transition-all group"
+                  className="w-full text-left border border-stone-200 rounded-xl px-5 py-4 hover:border-[#1B4332] hover:bg-green-50 transition-all group"
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="font-semibold text-gray-900">{tag.state} {tag.species}</span>
+                      <span className="font-black text-gray-900 tracking-tight">{tag.state} {tag.species}</span>
                       <span className="text-gray-400 text-sm ml-2">· {tag.weapon_type}</span>
                       {tag.is_primary && <span className="ml-2 text-xs bg-[#1B4332] text-white px-2 py-0.5 rounded-full">Primary</span>}
                     </div>
                     <div className="text-right">
-                      <span className="text-2xl font-bold text-[#1B4332]">{tag.points}</span>
+                      <span className="text-2xl font-black text-[#1B4332]">{tag.points}</span>
                       <span className="text-gray-400 text-sm ml-1">pts</span>
                     </div>
                   </div>
@@ -156,7 +156,7 @@ export default function ScoutChat({ pointsCombos, isPro, freeQueryUsed, emailVer
           )}
           <button
             onClick={() => window.location.href = '/account'}
-            className="w-full border-2 border-dashed border-gray-200 rounded-xl py-3 text-sm text-gray-400 hover:border-gray-300 hover:text-gray-500 transition-colors"
+            className="w-full border-2 border-dashed border-stone-200 rounded-xl py-3 text-sm text-gray-400 hover:border-stone-300 hover:text-gray-500 transition-colors"
           >
             + Add a tag to my profile
           </button>
@@ -166,7 +166,7 @@ export default function ScoutChat({ pointsCombos, isPro, freeQueryUsed, emailVer
   }
 
   return (
-    <div className="border border-gray-200 rounded-2xl overflow-hidden">
+    <div className="border border-stone-200 rounded-2xl overflow-hidden">
       {/* Header */}
       <div className="bg-[#1B4332] text-white px-6 py-4 flex items-center justify-between">
         <div>
@@ -191,12 +191,12 @@ export default function ScoutChat({ pointsCombos, isPro, freeQueryUsed, emailVer
 
       {/* Paywall state */}
       {!isPro && freeUsed && (
-        <div className="p-8 text-center bg-gray-50">
-          <p className="font-semibold text-gray-900 mb-1">You've used your free query</p>
+        <div className="p-8 text-center bg-stone-50">
+          <p className="font-black text-gray-900 tracking-tight mb-1">You've used your free query</p>
           <p className="text-gray-500 text-sm mb-5">Subscribe to Scout Pro to continue your strategy conversation and unlock all unit recommendations.</p>
           <a
             href="/scout/upgrade"
-            className="bg-[#1B4332] text-white px-6 py-2.5 rounded-xl font-medium hover:bg-[#163828] transition-colors inline-block"
+            className="bg-amber-400 text-black px-6 py-2.5 rounded-xl font-black hover:bg-amber-300 transition-colors inline-block"
           >
             Upgrade to Scout Pro — $9.99/mo
           </a>
@@ -215,7 +215,7 @@ export default function ScoutChat({ pointsCombos, isPro, freeQueryUsed, emailVer
                     <button
                       key={q}
                       onClick={() => sendMessage(q)}
-                      className="w-full text-left bg-gray-50 border border-gray-200 text-gray-700 text-sm px-4 py-3 rounded-xl hover:bg-green-50 hover:border-[#1B4332] transition-all"
+                      className="w-full text-left bg-stone-50 border border-stone-200 text-gray-700 text-sm px-4 py-3 rounded-xl hover:bg-green-50 hover:border-[#1B4332] transition-all"
                     >
                       {q}
                     </button>
@@ -229,7 +229,7 @@ export default function ScoutChat({ pointsCombos, isPro, freeQueryUsed, emailVer
                 <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm whitespace-pre-wrap ${
                   m.role === 'user'
                     ? 'bg-[#1B4332] text-white rounded-br-sm'
-                    : 'bg-gray-100 text-gray-900 rounded-bl-sm'
+                    : 'bg-stone-100 text-gray-900 rounded-bl-sm'
                 }`}>
                   {m.content || (loading && i === messages.length - 1 ? '...' : '')}
                 </div>
@@ -238,13 +238,13 @@ export default function ScoutChat({ pointsCombos, isPro, freeQueryUsed, emailVer
             <div ref={bottomRef} />
           </div>
 
-          <form onSubmit={handleSubmit} className="border-t border-gray-200 px-4 py-3 flex gap-3">
+          <form onSubmit={handleSubmit} className="border-t border-stone-200 px-4 py-3 flex gap-3">
             <input
               value={input}
               onChange={e => setInput(e.target.value)}
               placeholder="Ask about your draw strategy..."
               disabled={loading}
-              className="flex-1 border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332] disabled:bg-gray-50"
+              className="flex-1 border border-stone-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332] disabled:bg-stone-50"
             />
             <button
               type="submit" disabled={loading || !input.trim()}

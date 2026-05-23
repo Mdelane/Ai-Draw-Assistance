@@ -5,6 +5,9 @@ import Navbar from '@/components/Navbar'
 import ScoutChat from './ScoutChat'
 import ScoutOnboarding from './ScoutOnboarding'
 import OutfitterCards from './OutfitterCards'
+import { valuatePortfolio } from '@/lib/scout/pointValuation'
+import { getUpcomingDeadlines, type DeadlineAlert } from '@/lib/cron/point-guard'
+import DrawSimulator from './DrawSimulator'
 
 const STATES = ['CO', 'WY', 'MT', 'UT', 'ID', 'AZ', 'NV']
 
@@ -54,6 +57,7 @@ export default async function ScoutPage({ searchParams }: { searchParams: Promis
 
   // Fetch user's scout profile and points
   let pointsCombos: any[] = []
+  let upcomingDeadlines: DeadlineAlert[] = []
   if (user) {
     const adminSupabase = await createAdminClient()
     const [{ data: scoutProfile }, { data: points }] = await Promise.all([
@@ -62,6 +66,14 @@ export default async function ScoutPage({ searchParams }: { searchParams: Promis
     ])
     scoutProfileCompleted = scoutProfile?.completed ?? false
     pointsCombos = points ?? []
+
+    try {
+      const allDeadlines = await getUpcomingDeadlines(60)
+      const userStates = new Set(pointsCombos.map((c: any) => c.state))
+      upcomingDeadlines = allDeadlines.filter(d => userStates.has(d.state))
+    } catch {
+      upcomingDeadlines = []
+    }
   }
 
   // Draw odds table data
@@ -131,14 +143,21 @@ export default async function ScoutPage({ searchParams }: { searchParams: Promis
 
         <div className="flex items-end justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-[#1B4332]">Scout</h1>
-            <p className="text-gray-500 mt-1">AI-powered western big game draw strategy</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-[#1B4332] mb-1">AI Draw Strategy</p>
+            <h1 className="text-3xl font-black text-gray-900 tracking-tight">Scout</h1>
           </div>
-          {!isScoutPro && (
-            <Link href="/scout/upgrade" className="bg-[#1B4332] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#163828] transition-colors">
-              Upgrade to Scout Pro →
-            </Link>
-          )}
+          <div className="flex gap-3">
+            {user && (
+              <Link href="/party/new" className="border border-stone-300 text-gray-600 px-4 py-2.5 rounded-xl text-sm font-bold hover:border-[#1B4332] hover:text-[#1B4332] transition-colors">
+                Hunt with a group →
+              </Link>
+            )}
+            {!isScoutPro && (
+              <Link href="/scout/upgrade" className="bg-amber-400 text-gray-900 px-5 py-2.5 rounded-xl text-sm font-black hover:bg-amber-300 transition-colors">
+                Upgrade to Pro →
+              </Link>
+            )}
+          </div>
         </div>
 
         {/* Onboarding gate */}
@@ -161,26 +180,53 @@ export default async function ScoutPage({ searchParams }: { searchParams: Promis
 
         {/* Not logged in CTA */}
         {!user && (
-          <div className="bg-[#1B4332] text-white rounded-2xl p-8 text-center mb-8">
-            <h2 className="text-xl font-bold mb-2">Stop guessing. Apply for the right unit.</h2>
-            <p className="text-green-200 mb-5 text-sm">
-              Scout AI analyzes your preference points, draw trends, and unit data to tell you exactly where to apply.
-              Create a free account to get started.
-            </p>
-            <div className="flex gap-3 justify-center">
-              <Link href="/signup?next=/scout" className="bg-white text-[#1B4332] px-6 py-2.5 rounded-lg font-medium hover:bg-green-50 transition-colors">
-                Create free account
-              </Link>
-              <Link href="/login?next=/scout" className="border border-green-400 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-white/10 transition-colors">
-                Sign in
-              </Link>
+          <div className="bg-[#1B4332] text-white rounded-2xl p-10 text-center mb-10 relative overflow-hidden">
+            <div
+              className="absolute inset-0 opacity-[0.05]"
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+              }}
+            />
+            <div className="relative">
+              <h2 className="text-2xl font-black mb-2 tracking-tight">Stop guessing. Apply for the right unit.</h2>
+              <p className="text-green-200 mb-7 text-sm max-w-md mx-auto">
+                Scout AI analyzes your preference points, draw trends, and unit data to tell you exactly where to apply.
+              </p>
+              <div className="flex gap-3 justify-center">
+                <Link href="/signup?next=/scout" className="bg-amber-400 text-gray-900 px-6 py-3 rounded-xl font-black hover:bg-amber-300 transition-colors text-sm">
+                  Create free account
+                </Link>
+                <Link href="/login?next=/scout" className="bg-white/10 border border-white/30 text-white px-6 py-3 rounded-xl font-semibold hover:bg-white/20 transition-colors text-sm">
+                  Sign in
+                </Link>
+              </div>
             </div>
+          </div>
+        )}
+
+        {/* Deadline alert banner */}
+        {upcomingDeadlines.length > 0 && user && emailVerified && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl px-5 py-4 mb-6">
+            <p className="text-xs font-bold uppercase tracking-widest text-amber-700 mb-1">Application Window Alert</p>
+            {upcomingDeadlines.map(d => (
+              <p key={d.state} className="text-sm text-amber-900">
+                <strong>{d.state}</strong> — {d.displayNote}
+                {d.daysUntil !== null && d.daysUntil <= 14 && (
+                  <span className="ml-2 bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded-full">
+                    {d.daysUntil}d left
+                  </span>
+                )}
+              </p>
+            ))}
           </div>
         )}
 
         {/* Scout AI — leads the page */}
         {user && emailVerified && (
           <div className="mb-10">
+            <p className="text-xs text-gray-400 mt-1">
+              AI strategy is for informational purposes only and does not guarantee draw results. Always verify with state agency data before applying.
+            </p>
             <ScoutChat
               pointsCombos={pointsCombos}
               isPro={isScoutPro}
@@ -195,10 +241,46 @@ export default async function ScoutPage({ searchParams }: { searchParams: Promis
           </div>
         )}
 
+        {/* Points portfolio value */}
+        {user && emailVerified && pointsCombos.length > 0 && (() => {
+          const { valuations, totalInvested } = valuatePortfolio(
+            pointsCombos.map((c: any) => ({ state: c.state, species: c.species, points: c.points }))
+          )
+          return (
+            <div className="bg-stone-50 border border-stone-200 rounded-2xl p-5 mb-10">
+              <p className="text-xs font-bold uppercase tracking-widest text-[#1B4332] mb-1">Points Portfolio</p>
+              <p className="font-black tracking-tight text-gray-900 text-lg mb-4">
+                Your points represent ~${totalInvested.toLocaleString()} in application investments
+              </p>
+              <div className="space-y-2 mb-4">
+                {valuations.map((v, i) => (
+                  <div key={i} className="flex flex-wrap gap-x-3 gap-y-0.5 text-sm text-gray-500">
+                    <span className="font-medium text-gray-700 capitalize">{v.state} {v.species}</span>
+                    <span>·</span>
+                    <span>{v.points} {v.points === 1 ? 'pt' : 'pts'}</span>
+                    <span>·</span>
+                    <span>${v.annualFee}/yr</span>
+                    <span>·</span>
+                    <span>~${v.totalInvested.toLocaleString()} invested</span>
+                  </div>
+                ))}
+              </div>
+              <p className="text-gray-500 text-sm">
+                Tip: Each year you apply builds your investment. Use Scout to make sure that investment pays off with a draw.
+              </p>
+            </div>
+          )
+        })()}
+
+        {/* Draw Simulator */}
+        {user && emailVerified && pointsCombos.length > 0 && (
+          <DrawSimulator pointsCombos={pointsCombos} isPro={isScoutPro} />
+        )}
+
         {/* Draw odds table — reference section */}
-        <div className="border-t border-gray-100 pt-8">
-          <h2 className="text-lg font-semibold text-gray-800 mb-2">Draw odds reference table</h2>
-          <p className="text-sm text-gray-400 mb-6">Browse raw draw odds data by state, species, and weapon. Free for all users.</p>
+        <div className="border-t border-gray-100 pt-10">
+          <h2 className="text-lg font-black text-gray-900 tracking-tight mb-1">Draw odds reference table</h2>
+          <p className="text-sm text-gray-400 mb-6">Real data from state game agencies via FOIA. Free for all users.</p>
 
           <form method="get" className="grid grid-cols-5 gap-3 mb-6">
             <select name="state" defaultValue={params.state ?? ''} className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]">
@@ -292,6 +374,14 @@ export default async function ScoutPage({ searchParams }: { searchParams: Promis
               Select a state, species, and weapon type to see draw odds.
             </div>
           )}
+        </div>
+
+        {/* Data provenance */}
+        <div className="mt-12 border-t border-stone-200 pt-6 text-center">
+          <p className="text-xs text-gray-400 max-w-xl mx-auto leading-relaxed">
+            Draw odds data is sourced from state wildlife agencies via public records requests (FOIA). Data reflects historical draw results and is updated annually. Odds shown are based on prior-year results and do not guarantee future draw outcomes.{' '}
+            <a href="/faq#scout-data" className="underline hover:text-gray-600">Learn more →</a>
+          </p>
         </div>
 
       </main>

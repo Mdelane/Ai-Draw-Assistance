@@ -58,9 +58,9 @@ export default function ReviewPage() {
       <Navbar />
       <div className="max-w-md mx-auto px-6 py-16 text-center">
         <div className="text-5xl mb-4">⭐</div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Thanks for your review!</h1>
+        <h1 className="text-2xl font-black text-gray-900 tracking-tight mb-2">Thanks for your review!</h1>
         <p className="text-gray-500 mb-6">Your feedback helps other hunters find great outfitters.</p>
-        <Link href="/dashboard" className="text-[#1B4332] font-medium hover:underline">Back to dashboard</Link>
+        <Link href="/dashboard" className="inline-block bg-amber-400 text-black px-5 py-2.5 rounded-xl font-black hover:bg-amber-300 transition-colors">Back to dashboard</Link>
       </div>
     </>
   )
@@ -69,7 +69,7 @@ export default function ReviewPage() {
     <>
       <Navbar />
       <main className="max-w-md mx-auto px-6 py-10">
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">Leave a review</h1>
+        <h1 className="text-2xl font-black text-gray-900 tracking-tight mb-1">Leave a review</h1>
         {listing && <p className="text-gray-500 text-sm mb-8">{listing.title} · {listing.outfitter_profiles?.business_name}</p>}
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -99,13 +99,13 @@ export default function ReviewPage() {
               value={body}
               onChange={e => setBody(e.target.value)}
               placeholder="Tell other hunters about your experience..."
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
+              className="w-full border border-stone-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
             />
           </div>
 
           <button
             type="submit" disabled={loading}
-            className="w-full bg-[#1B4332] text-white py-3 rounded-lg font-medium hover:bg-[#163828] transition-colors disabled:opacity-50"
+            className="w-full bg-amber-400 text-black py-3 rounded-xl font-black hover:bg-amber-300 transition-colors disabled:opacity-50"
           >
             {loading ? 'Submitting...' : 'Submit review'}
           </button>

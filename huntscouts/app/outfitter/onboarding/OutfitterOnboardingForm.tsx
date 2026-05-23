@@ -90,7 +90,7 @@ export default function OutfitterOnboardingForm({ userId, foundingOutfitter = fa
         </div>
       </div>
 
-      <button type="submit" disabled={saving} className="w-full bg-[#1B4332] text-white py-3 rounded-xl font-medium hover:bg-[#163828] transition-colors disabled:opacity-50 mt-2">
+      <button type="submit" disabled={saving} className="w-full bg-amber-400 text-black py-3 rounded-xl font-black hover:bg-amber-300 transition-colors disabled:opacity-50 mt-2">
         {saving ? 'Setting up your profile...' : 'Create profile & add first listing →'}
       </button>
 
@@ -99,4 +99,4 @@ export default function OutfitterOnboardingForm({ userId, foundingOutfitter = fa
   )
 }
 
-const inp = 'w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]'
+const inp = 'w-full border border-stone-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B4332]'

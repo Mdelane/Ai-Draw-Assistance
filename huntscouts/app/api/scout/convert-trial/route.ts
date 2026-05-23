@@ -5,7 +5,8 @@ import { Resend } from 'resend'
 import Stripe from 'stripe'
 
 export async function POST(req: NextRequest) {
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+  if (!process.env.STRIPE_SECRET_KEY) return NextResponse.json({ error: 'Payments not yet configured' }, { status: 503 })
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
   const resend = new Resend(process.env.RESEND_API_KEY)
   let userCtx: Awaited<ReturnType<typeof requireUser>>
   try {

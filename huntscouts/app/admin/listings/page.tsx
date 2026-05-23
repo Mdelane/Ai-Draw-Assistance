@@ -19,16 +19,16 @@ export default async function AdminListings() {
     <>
       <Navbar />
       <main className="max-w-5xl mx-auto px-6 py-10">
-        <h1 className="text-2xl font-bold text-gray-900 mb-8">Outfitter verification</h1>
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <h1 className="text-2xl font-black tracking-tight text-gray-900 mb-8">Outfitter verification</h1>
+        <div className="bg-white border border-stone-200 rounded-2xl overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-stone-50 border-b border-stone-200">
               <tr>
-                <th className="text-left px-5 py-3 font-medium text-gray-600">Business</th>
-                <th className="text-left px-5 py-3 font-medium text-gray-600">Email</th>
-                <th className="text-left px-5 py-3 font-medium text-gray-600">State</th>
-                <th className="text-left px-5 py-3 font-medium text-gray-600">License #</th>
-                <th className="text-left px-5 py-3 font-medium text-gray-600">Status</th>
+                <th className="text-left px-5 py-3 text-xs font-bold uppercase tracking-widest text-stone-500">Business</th>
+                <th className="text-left px-5 py-3 text-xs font-bold uppercase tracking-widest text-stone-500">Email</th>
+                <th className="text-left px-5 py-3 text-xs font-bold uppercase tracking-widest text-stone-500">State</th>
+                <th className="text-left px-5 py-3 text-xs font-bold uppercase tracking-widest text-stone-500">License #</th>
+                <th className="text-left px-5 py-3 text-xs font-bold uppercase tracking-widest text-stone-500">Status</th>
                 <th className="px-5 py-3"></th>
               </tr>
             </thead>

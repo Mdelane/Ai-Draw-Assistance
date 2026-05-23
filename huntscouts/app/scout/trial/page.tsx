@@ -82,7 +82,7 @@ export default function ScoutTrialPage() {
           ← Back to upgrade
         </Link>
 
-        <h1 className="text-2xl font-bold text-[#1B4332] mb-2">Start your free trial</h1>
+        <h1 className="text-2xl font-black text-gray-900 tracking-tight mb-2">Start your free trial</h1>
         <p className="text-gray-500 text-sm mb-8">
           7 days free — card required. You won't be charged until day 8. Cancel anytime.
         </p>
@@ -101,7 +101,7 @@ export default function ScoutTrialPage() {
           <button
             type="submit"
             disabled={submitting || loading}
-            className="w-full bg-[#1B4332] text-white py-3 rounded-xl font-medium hover:bg-[#163828] transition-colors disabled:opacity-50"
+            className="w-full bg-amber-400 text-black py-3 rounded-xl font-black hover:bg-amber-300 transition-colors disabled:opacity-50"
           >
             {submitting ? 'Activating trial...' : 'Start 7-day free trial'}
           </button>
@@ -111,7 +111,7 @@ export default function ScoutTrialPage() {
           </p>
         </form>
 
-        <div className="mt-8 bg-gray-50 rounded-xl p-5 text-sm text-gray-600 space-y-2">
+        <div className="mt-8 bg-stone-50 border border-stone-200 rounded-2xl p-5 text-sm text-gray-600 space-y-2">
           <div className="flex gap-2">
             <span className="text-[#1B4332] font-bold">✓</span>
             <span>20 AI strategy queries during your trial</span>

@@ -15,10 +15,11 @@ export default function OutfitterApplyPage() {
       <main className="max-w-3xl mx-auto px-6 py-16">
         {/* Hero */}
         <div className="text-center mb-12">
-          <span className="inline-block bg-amber-100 text-amber-800 text-sm font-semibold px-3 py-1 rounded-full mb-4">
+          <p className="text-xs font-bold uppercase tracking-widest text-amber-600 mb-3">Outfitter Partnership</p>
+          <span className="inline-block bg-amber-400 text-black text-xs font-black uppercase tracking-widest px-3 py-1 rounded-full mb-4">
             Founding Outfitter — First 50 spots
           </span>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Join HuntScouts</h1>
+          <h1 className="text-5xl font-black tracking-tight text-gray-900 mb-4">Join HuntScouts</h1>
           <p className="text-gray-500 text-lg max-w-xl mx-auto">
             Get in front of serious western big game hunters. Founding outfitters lock in 7% commission — permanently.
           </p>
@@ -28,8 +29,8 @@ export default function OutfitterApplyPage() {
         <div className="grid grid-cols-2 gap-6 mb-14">
           {/* Step 1: Tally intake */}
           <div className="bg-white border border-gray-200 rounded-2xl p-8">
-            <div className="text-[#1B4332] font-bold text-2xl mb-1">Step 1</div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-3">Tell us about your operation</h2>
+            <div className="text-amber-500 font-black text-2xl mb-1">Step 1</div>
+            <h2 className="text-lg font-black text-gray-900 mb-3">Tell us about your operation</h2>
             <p className="text-gray-500 text-sm mb-6">
               Takes about 3 minutes. We review every application to keep listing quality high.
             </p>
@@ -37,7 +38,7 @@ export default function OutfitterApplyPage() {
               href="https://tally.so/r/REPLACE_WITH_TALLY_FORM_ID"
               target="_blank"
               rel="noopener noreferrer"
-              className="block w-full bg-[#1B4332] text-white text-center py-3 rounded-xl font-medium hover:bg-[#163828] transition-colors"
+              className="block w-full bg-amber-400 text-black text-center py-3 rounded-xl font-black hover:bg-amber-300 transition-colors"
             >
               Fill out the application →
             </a>
@@ -46,7 +47,7 @@ export default function OutfitterApplyPage() {
           {/* Step 2: Cal.com */}
           <div className="bg-gray-50 border border-gray-200 rounded-2xl p-8">
             <div className="text-gray-400 font-bold text-2xl mb-1">Step 2</div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-3">Book a 15-min onboarding call</h2>
+            <h2 className="text-lg font-black text-gray-900 mb-3">Book a 15-min onboarding call</h2>
             <p className="text-gray-500 text-sm mb-6">
               We&apos;ll walk through listing setup, photo guidelines, pricing strategy, and your first booking.
             </p>
@@ -63,11 +64,11 @@ export default function OutfitterApplyPage() {
 
         {/* Commission comparison */}
         <div className="bg-[#1B4332] text-white rounded-2xl p-8 mb-12">
-          <h2 className="text-xl font-bold mb-6 text-center">Founding outfitter vs standard</h2>
+          <h2 className="text-xl font-black mb-6 text-center">Founding outfitter vs standard</h2>
           <div className="grid grid-cols-2 gap-8">
             <div>
-              <div className="text-amber-400 font-bold text-lg mb-1">Founding Outfitter</div>
-              <div className="text-4xl font-bold mb-2">7%</div>
+              <div className="text-amber-400 font-black text-lg mb-1">Founding Outfitter</div>
+              <div className="text-4xl font-black mb-2">7%</div>
               <div className="text-green-200 text-sm">Commission on bookings. First 50 outfitters only — locked in permanently.</div>
               <div className="mt-4 space-y-2 text-sm text-green-100">
                 {[
@@ -79,8 +80,8 @@ export default function OutfitterApplyPage() {
               </div>
             </div>
             <div>
-              <div className="text-green-300 font-bold text-lg mb-1">Standard Outfitter</div>
-              <div className="text-4xl font-bold text-green-300 mb-2">10%</div>
+              <div className="text-green-300 font-black text-lg mb-1">Standard Outfitter</div>
+              <div className="text-4xl font-black text-green-300 mb-2">10%</div>
               <div className="text-green-200 text-sm">Commission on bookings. Available to all outfitters after the first 50 spots are filled.</div>
               <div className="mt-4 space-y-2 text-sm text-green-200">
                 {[
@@ -96,14 +97,14 @@ export default function OutfitterApplyPage() {
 
         {/* Earnings example */}
         <div className="bg-white border border-gray-200 rounded-2xl p-8 mb-12">
-          <h2 className="text-lg font-semibold text-gray-900 mb-5">What you keep per booking</h2>
+          <h2 className="text-lg font-black text-gray-900 mb-5">What you keep per booking</h2>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-100">
-                  <th className="text-left py-2 text-gray-500 font-medium">Hunt price</th>
-                  <th className="text-left py-2 text-gray-500 font-medium">Founding (7%)</th>
-                  <th className="text-left py-2 text-gray-500 font-medium">Standard (10%)</th>
+                  <th className="text-left py-2 text-gray-500 text-xs font-bold uppercase tracking-wider">Hunt price</th>
+                  <th className="text-left py-2 text-gray-500 text-xs font-bold uppercase tracking-wider">Founding (7%)</th>
+                  <th className="text-left py-2 text-gray-500 text-xs font-bold uppercase tracking-wider">Standard (10%)</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
