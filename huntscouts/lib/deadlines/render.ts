@@ -19,7 +19,7 @@ export function formatTimeZoneLabel(eventTime: string | null, timezone: string):
   const minute = parseInt(minuteStr, 10)
   const period = hour24 >= 12 ? 'PM' : 'AM'
   const hour12 = hour24 % 12 === 0 ? 12 : hour24 % 12
-  const timeStr = minute === 0 ? `${hour12} ${period}` : `${hour12}:${String(minute).padStart(2, '0')} ${period}`
+  const timeStr = `${hour12}:${String(minute).padStart(2, '0')} ${period}`
   const tzLabel = TZ_LABELS[timezone] ?? timezone
   return `${timeStr} ${tzLabel}`
 }
