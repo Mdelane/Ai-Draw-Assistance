@@ -62,11 +62,18 @@ create table if not exists state_deadlines (
   supersedes uuid references state_deadlines(id),
   display_label text,
   notes text,
-  created_at timestamptz default now(),
-  unique(state, year, deadline_type, species, residency)
+  created_at timestamptz default now()
 );
 
 create index if not exists idx_deadlines_lookup on state_deadlines(state, year, status);
+
+-- Partial unique index: at most one non-superseded row per natural key.
+-- Superseded rows are excluded so the supersession pattern (old row kept
+-- as 'superseded', new row inserted as 'verified', both sharing the same
+-- natural key) can coexist for a full audit trail without collisions.
+create unique index if not exists idx_deadlines_natural_key
+  on state_deadlines(state, year, deadline_type, species, residency)
+  where status <> 'superseded';
 
 -- Hunt Atlas — 2026 Deadline Seed Data
 -- All dates verified against agency/primary sources on 2026-07-13.
