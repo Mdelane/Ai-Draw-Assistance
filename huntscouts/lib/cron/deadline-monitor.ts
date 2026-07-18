@@ -165,7 +165,7 @@ export async function runDeadlineMonitor(): Promise<{ checked: number; changed: 
       if (classified.classification !== 'changed' || !classified.new_event_date) continue
       const oldRow = (currentRows ?? []).find((r) => r.id === classified.id) as StateDeadlineRow | undefined
       if (!oldRow) continue
-      await supabase.from('state_deadlines').insert({
+      const { error: insertError } = await supabase.from('state_deadlines').insert({
         state: oldRow.state,
         year: oldRow.year,
         species: oldRow.species,
@@ -180,11 +180,15 @@ export async function runDeadlineMonitor(): Promise<{ checked: number; changed: 
         display_label: oldRow.display_label,
         notes: `Monitor detected a date change from ${oldRow.event_date} on ${new Date().toISOString().slice(0, 10)}.`,
       })
-      pendingCount++
+      if (insertError) {
+        console.error(`[deadline-monitor] failed to insert pending_review row for ${oldRow.state}:`, insertError.message)
+      } else {
+        pendingCount++
+      }
     }
 
     for (const newEvent of extraction.new_events) {
-      await supabase.from('state_deadlines').insert({
+      const { error: insertError } = await supabase.from('state_deadlines').insert({
         state: source.state,
         year: currentYear,
         species: newEvent.species,
@@ -198,7 +202,11 @@ export async function runDeadlineMonitor(): Promise<{ checked: number; changed: 
         display_label: newEvent.display_label,
         notes: `Monitor found a new event not previously tracked: ${newEvent.notes}`,
       })
-      pendingCount++
+      if (insertError) {
+        console.error(`[deadline-monitor] failed to insert pending_review row for ${source.state}:`, insertError.message)
+      } else {
+        pendingCount++
+      }
     }
 
     await supabase
