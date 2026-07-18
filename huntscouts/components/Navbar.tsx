@@ -27,6 +27,7 @@ export default function Navbar() {
             <Link href="/listings" className="hover:text-green-200 transition-colors">Browse Hunts</Link>
             <Link href="/outfitters" className="hover:text-green-200 transition-colors">Outfitters</Link>
             <Link href="/scout" className="hover:text-green-200 transition-colors">Scout</Link>
+            <Link href="/deadlines" className="hover:text-green-200 transition-colors">Deadlines</Link>
           </div>
         </div>
 
@@ -90,6 +91,7 @@ export default function Navbar() {
           <Link href="/listings" className="block hover:text-green-200" onClick={() => setMenuOpen(false)}>Browse Hunts</Link>
           <Link href="/outfitters" className="block hover:text-green-200" onClick={() => setMenuOpen(false)}>Outfitters</Link>
           <Link href="/scout" className="block hover:text-green-200" onClick={() => setMenuOpen(false)}>Scout</Link>
+          <Link href="/deadlines" className="block hover:text-green-200" onClick={() => setMenuOpen(false)}>Deadlines</Link>
           {profile ? (
             <>
               <Link href={profile.role === 'outfitter' ? '/outfitter/dashboard' : '/dashboard'} className="block hover:text-green-200" onClick={() => setMenuOpen(false)}>Dashboard</Link>
