@@ -43,7 +43,7 @@ export default async function AdminDashboard() {
           ))}
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           <Link href="/admin/users" className="bg-white border border-stone-200 rounded-2xl p-5 hover:border-amber-400 transition-colors">
             <div className="font-black tracking-tight text-gray-900">Manage users</div>
             <div className="text-stone-500 text-sm mt-1">View all accounts, change roles</div>
@@ -51,6 +51,10 @@ export default async function AdminDashboard() {
           <Link href="/admin/listings" className="bg-white border border-stone-200 rounded-2xl p-5 hover:border-amber-400 transition-colors">
             <div className="font-black tracking-tight text-gray-900">Verify outfitters</div>
             <div className="text-stone-500 text-sm mt-1">Review licenses, verify profiles</div>
+          </Link>
+          <Link href="/admin/deadlines" className="bg-white border border-stone-200 rounded-2xl p-5 hover:border-amber-400 transition-colors">
+            <div className="font-black tracking-tight text-gray-900">Deadline verification</div>
+            <div className="text-stone-500 text-sm mt-1">Review agency source changes, confirm annual dates</div>
           </Link>
         </div>
       </main>
