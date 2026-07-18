@@ -258,6 +258,125 @@
 
 ---
 
+---
+
+## PHASE 9 — Unit Intelligence & Trip Planning
+
+> Goal: every unit page becomes the single best resource on the internet for hunting that unit. More useful than any forum post, guidebook, or outfitter brochure.
+
+---
+
+### 9A — Database Schema
+
+- [ ] `unit_weather` table — unit_id, month (1–12), avg_high_f, avg_low_f, avg_precipitation_in, avg_snowfall_in, data_source
+- [ ] `unit_access_profile` table — unit_id, utv_accessible, horse_accessible, backpack_in_required, truck_camping, mountain_bike, ebike_accessible, min_elevation_ft, max_elevation_ft, terrain_difficulty (1–5 scale), road_condition_notes, pack_out_required
+- [ ] `unit_water_sources` table — id, unit_id, name, type (stream/spring/lake/reservoir/stock_tank), lat_approx, lng_approx, seasonal (bool), peak_months int[], treatment_required (bool), notes
+- [ ] `unit_ranger_stations` table — id, state, unit_id (nullable — one station may serve multiple units), name, agency (USFS/BLM/State/County), address, phone, website, hours_notes, is_kill_validation_station (bool), validation_method (online/in-person/phone/any)
+- [ ] `unit_regulations` table — id, state, species, year, unit_id (nullable), kill_reporting_required (bool), kill_reporting_methods text[], kill_reporting_deadline_hours int, document_url, key_notes text
+- [ ] `unit_documents` table — id, state, species, year, unit_id (nullable), document_type (regulations/map/access), title, file_url, source_agency, last_verified_at
+- [ ] Extend `unit_context` — add gear_recommendation text, access_summary text, unit_centroid_lat, unit_centroid_lng
+
+---
+
+### 9B — Weather Integration
+
+- [ ] NOAA Climate Data Online API — fetch 30-year monthly normals by lat/lng (free, no key required for normals endpoint)
+- [ ] Unit centroid coordinates — compile lat/lng center for each unit (manual or from state GIS shapefiles)
+- [ ] `scripts/generate-unit-weather.mjs` — iterates units, hits NOAA API, populates `unit_weather` table
+- [ ] "Hunt window" detector — auto-highlight the 2–3 months relevant to each species/season type (e.g. Sept–Nov for elk)
+- [ ] Weather display component on unit detail — monthly stat cards for hunt window: high/low temp, precip, snowfall
+- [ ] Snowfall warning flag — if avg snowfall > 6" in hunt month, show "❄ Early snow possible — check road conditions before departure"
+- [ ] Forecast integration (optional) — if hunt date is within 10 days, pull live 10-day forecast from NWS API
+
+---
+
+### 9C — Terrain & Access Profile
+
+- [ ] Expand access type to structured boolean fields per unit (see schema above)
+- [ ] Elevation data — pull min/max elevation per unit from USGS 3DEP or NED elevation dataset
+- [ ] Terrain difficulty rating (1=flat/road-accessible, 5=technical pack-in, cliff/talus only)
+- [ ] Access profile UI chips on unit detail — icon row: 🚗 Truck Camping · 🐴 Horse · 🏕 Backpack · 🛻 UTV · 🚵 Mountain Bike
+- [ ] "Pack in only" warning badge — prominent red banner if backpack_in_required = true
+- [ ] "What to drive" section — explicit plain-English recommendation based on access profile
+- [ ] Seasonal road closure notes — many forest roads close Nov 1 or after first snow; capture per unit
+
+---
+
+### 9D — Water Sources
+
+- [ ] USGS National Hydrography Dataset (NHD) download — free shapefile download per state at nhd.usgs.gov
+- [ ] `scripts/import-nhd-water-sources.mjs` — process NHD GIS shapefiles, clip to unit boundaries, import named water features into `unit_water_sources`
+- [ ] Manual review pass — flag stock tanks, springs (often unnamed in NHD), remove irrelevant features
+- [ ] Water source display on unit detail — list with type icon, seasonal availability, and treatment warning
+- [ ] Giardia/treatment notice — "Always treat or filter backcountry water. Giardia is present in most western drainages."
+- [ ] Late-season dryness flag — if unit is high desert (UT/AZ/NV/NM) and hunt month is Aug–Sept, flag "Many water sources dry by late summer — cache water or confirm sources before entry"
+
+---
+
+### 9E — Ranger Stations & Kill Validation
+
+- [ ] Research kill reporting requirements per state × species (7 states × ~5 species = ~35 combinations)
+  - [ ] Colorado — CPW online reporting via MyColoradoHunt (most species within 48 hrs)
+  - [ ] Wyoming — online or phone for most; in-person check station for some regions
+  - [ ] Montana — harvest report card system; some species require check station or phone report
+  - [ ] Utah — online reporting via WILD app within 48 hrs for most big game
+  - [ ] Idaho — iHunt app or phone within 5 days for most species
+  - [ ] Arizona — AZGFD online or phone within 48 hrs; some species in-person
+  - [ ] Nevada — online reporting within 3 days; some check stations during peak seasons
+- [ ] Compile ranger station directory — USFS + BLM district offices serving each unit (address, phone, hours, GPS)
+  - [ ] Colorado units
+  - [ ] Wyoming units
+  - [ ] Montana units
+  - [ ] Utah units
+  - [ ] Idaho units
+  - [ ] Arizona units
+  - [ ] Nevada units
+- [ ] Kill validation card on unit detail — prominent callout: method, deadline, link/phone number
+- [ ] `/states/[state]/regulations` page — flat reference page with kill reporting matrix by species
+- [ ] Ranger station cards on unit detail — name, agency badge, address, phone, map link, "Kill validation here" badge if applicable
+
+---
+
+### 9F — Regulations Documents
+
+- [ ] Download current-year regulation PDFs for each state × species (update each spring when states publish)
+  - [ ] Colorado — cpw.state.co.us
+  - [ ] Wyoming — wgfd.wyo.gov
+  - [ ] Montana — fwp.mt.gov
+  - [ ] Utah — wildlife.utah.gov
+  - [ ] Idaho — idfg.idaho.gov
+  - [ ] Arizona — azgfd.com
+  - [ ] Nevada — ndow.org
+- [ ] Upload PDFs to Supabase Storage or Vercel Blob; store URLs in `unit_documents` table
+- [ ] Key regulations extractor — Claude prompt to parse each PDF and extract: season dates, bag limit, legal weapons, special unit restrictions, application deadlines
+- [ ] Store extracted key regs as structured JSON in `unit_regulations.key_notes`
+- [ ] Display on unit detail — "Key Regs" card with extracted bullet points + "View full regulations PDF →" link
+- [ ] Annual update reminder — cron job that flags `unit_documents` records where `last_verified_at < current_year` each January
+
+---
+
+### 9G — AI Gear Recommendation
+
+- [ ] Gear recommendation prompt — Claude generates gear list from: terrain_difficulty, access_type, species, elevation, hunt_month, group_size
+- [ ] Gear categories: Transport method · Shelter · Water treatment · Navigation · Communication · First aid · Packing out
+- [ ] "What you'll need to get there" section — lead with transport recommendation (truck, horse trailer, UTV, backpack)
+- [ ] Store generated recommendation in `unit_context.gear_recommendation` (regenerate if access profile changes)
+- [ ] Gear checklist display — expandable sections per category, printable
+- [ ] Weight estimate flag — if terrain_difficulty >= 4, show estimated pack weight range for a multi-day hunt
+
+---
+
+### 9H — Hunt Prep Trip Card
+
+- [ ] Dynamic trip card generator — user selects unit + species + dates + group size → generates shareable trip summary
+- [ ] Trip card contents: unit info, access route, gear recommendation, water sources, ranger station, kill reporting method, emergency contacts, weather forecast
+- [ ] Printable / PDF export
+- [ ] Shareable link — `/trip/[token]` with pre-filled trip card (no login required to view)
+- [ ] Emergency contact slot — user enters satellite communicator number (Garmin inReach, SPOT) + party contact
+- [ ] "Leave No Trace" reminder section — unit-specific (more critical in high-pressure units)
+
+---
+
 ## DEFERRED (Needs resources/credentials)
 
 | Item | Blocker |
