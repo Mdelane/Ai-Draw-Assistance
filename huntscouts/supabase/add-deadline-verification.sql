@@ -67,13 +67,15 @@ create table if not exists state_deadlines (
 
 create index if not exists idx_deadlines_lookup on state_deadlines(state, year, status);
 
--- Partial unique index: at most one non-superseded row per natural key.
--- Superseded rows are excluded so the supersession pattern (old row kept
--- as 'superseded', new row inserted as 'verified', both sharing the same
--- natural key) can coexist for a full audit trail without collisions.
+-- Partial unique index: at most one authoritative row per natural key.
+-- Scoped to 'verified' and 'pending_publication' only, so a 'pending_review'
+-- proposal (inserted by the monitor when it detects a changed date) can
+-- coexist alongside the still-authoritative row it's proposing to replace,
+-- and superseded history rows can coexist for a full audit trail without
+-- collisions.
 create unique index if not exists idx_deadlines_natural_key
   on state_deadlines(state, year, deadline_type, species, residency)
-  where status <> 'superseded';
+  where status in ('verified', 'pending_publication');
 
 -- Hunt Atlas — 2026 Deadline Seed Data
 -- All dates verified against agency/primary sources on 2026-07-13.
@@ -196,3 +198,18 @@ insert into state_deadlines (state, year, species, residency, deadline_type, eve
 ('WY', 2026, array['elk','deer','pronghorn'], 'all', 'leftover_fcfs_start', '2026-07-17', null, 'America/Denver', 'verified', 'https://wgfd.wyo.gov/licenses-applications', '2026-07-13', 'max+claude', 'FCFS Leftover Sales Begin', 'WGFD site: buy buttons enabled July 17.'),
 ('WY', 2026, array['elk','deer','pronghorn'], 'all', 'points_only_open', '2026-07-01', null, 'America/Denver', 'verified', 'https://backboneunlimited.com/blogs/advice/wyoming-non-resident-draw-guide-2026-how-to-apply-for-elk-mule-deer-antelope-tags', '2026-07-13', 'max+claude', 'Preference Point Purchase Opens', 'Points NOT auto-awarded on unsuccessful apps — must purchase in this window. Critical UX callout.'),
 ('WY', 2026, array['elk','deer','pronghorn'], 'all', 'points_only_close', '2026-10-31', null, 'America/Denver', 'pending_publication', 'https://backboneunlimited.com/blogs/advice/wyoming-non-resident-draw-guide-2026-how-to-apply-for-elk-mule-deer-antelope-tags', null, null, 'Preference Point Purchase Deadline', 'CONFLICT: sources show Oct 31 vs Nov 2, 2026 (Oct 31 is a Saturday). Confirm on wgfd.wyo.gov before display.');
+
+-- ============================================================
+-- ROW LEVEL SECURITY
+-- ============================================================
+
+alter table deadline_sources enable row level security;
+alter table state_deadlines enable row level security;
+
+do $$ begin
+  create policy "Public can view deadline sources" on deadline_sources for select using (true);
+exception when duplicate_object then null; end $$;
+
+do $$ begin
+  create policy "Public can view state deadlines" on state_deadlines for select using (true);
+exception when duplicate_object then null; end $$;

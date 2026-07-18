@@ -36,7 +36,7 @@ export default function DeadlineRow({ row, agencyAbbr }: { row: StateDeadlineRow
           </span>
         </div>
         <p className="text-xs text-stone-500 mt-1">
-          {row.notes ?? 'This date has not yet been confirmed against the agency source.'}
+          This date is being confirmed against the agency source and hasn&rsquo;t been published yet.
         </p>
         <a
           href={row.source_url}
