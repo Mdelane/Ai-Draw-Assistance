@@ -241,3 +241,21 @@ export async function sendNurtureDay7({
     `),
   })
 }
+
+export async function sendDeadlineChangeDetected({
+  adminEmail, state, agencyName, pendingCount,
+}: {
+  adminEmail: string; state: string; agencyName: string; pendingCount: number
+}) {
+  await getResend().emails.send({
+    from: FROM,
+    to: adminEmail,
+    subject: `Deadline change detected: ${state}`,
+    html: `
+      <p>The deadline monitor detected a content change on ${agencyName}'s (${state}) deadline page.</p>
+      <p><strong>${pendingCount}</strong> row(s) are now pending review.</p>
+      <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/admin/deadlines">Review in the admin dashboard →</a></p>
+      <p>— Hunt Atlas deadline monitor</p>
+    `,
+  })
+}
